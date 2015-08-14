@@ -104,26 +104,26 @@ define Build/Compile
 endef
 
 define Package/dropbear/install
-	$(INSTALL_DIR) $(1)/usr/sbin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dropbearmulti $(1)/usr/sbin/dropbear
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(LN) ../sbin/dropbear $(1)/usr/bin/scp
-	$(LN) ../sbin/dropbear $(1)/usr/bin/ssh
-	$(LN) ../sbin/dropbear $(1)/usr/bin/dbclient
-	$(LN) ../sbin/dropbear $(1)/usr/bin/dropbearkey
+	$(INSTALL_DIR) $(1)/sbin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dropbearmulti $(1)/sbin/dropbear
+	$(INSTALL_DIR) $(1)/bin
+	$(LN) ../sbin/dropbear $(1)/bin/scp
+	$(LN) ../sbin/dropbear $(1)/bin/ssh
+	$(LN) ../sbin/dropbear $(1)/bin/dbclient
+	$(LN) ../sbin/dropbear $(1)/bin/dropbearkey
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./files/dropbear.config $(1)/etc/config/dropbear
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/dropbear.init $(1)/etc/init.d/dropbear
-	$(INSTALL_DIR) $(1)/usr/lib/opkg/info
+	$(INSTALL_DIR) $(1)/lib/opkg/info
 	$(INSTALL_DIR) $(1)/etc/dropbear
 	touch $(1)/etc/dropbear/dropbear_rsa_host_key
 	touch $(1)/etc/dropbear/dropbear_dss_host_key
 endef
 
 define Package/dropbearconvert/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dropbearconvert $(1)/usr/bin/dropbearconvert
+	$(INSTALL_DIR) $(1)/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dropbearconvert $(1)/bin/dropbearconvert
 endef
 
 $(eval $(call BuildPackage,dropbear))
