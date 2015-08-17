@@ -8,7 +8,3 @@
 }
 
 [ -f "/etc/board.json" ] || return 1
-[ -f "/etc/config/network" ] || {
-	touch /etc/config/network
-	/bin/config_generate
-}
