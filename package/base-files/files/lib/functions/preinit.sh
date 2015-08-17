@@ -65,10 +65,13 @@ boot_run_hook() {
 }
 
 pivot() { # <new_root> <old_root>
+	true
 }
 
 fopivot() { # <rw_root> <ro_root> <dupe?>
+	true
 }
 
 ramoverlay() {
+	true
 }
