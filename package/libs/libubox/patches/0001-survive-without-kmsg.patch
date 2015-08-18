@@ -1,0 +1,32 @@
+diff --git a/ulog.c b/ulog.c
+index 66aad90..a31fa6b 100644
+--- a/ulog.c
++++ b/ulog.c
+@@ -23,6 +23,8 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
+ 
+ static int _ulog_channels = -1;
+ static int _ulog_facility = -1;
+@@ -89,10 +91,15 @@ static void ulog_defaults(void)
+ static void ulog_kmsg(int priority, const char *fmt, va_list ap)
+ {
+ 	FILE *kmsg;
++	struct stat st;
++	if ( (!stat("/dev/kmsg",&st)) && (S_ISCHR(st.st_mode)) ) {
++		kmsg = fopen("/dev/kmsg", "w");
++		if (kmsg) fprintf(kmsg, "<%u>", priority);
++	} else {
++		kmsg = fopen("/dev/console", "w");
++	}
+ 
+-	if ((kmsg = fopen("/dev/kmsg", "w")) != NULL) {
+-		fprintf(kmsg, "<%u>", priority);
+-
++	if (kmsg) {
+ 		if (_ulog_ident)
+ 			fprintf(kmsg, "%s: ", _ulog_ident);
+ 
