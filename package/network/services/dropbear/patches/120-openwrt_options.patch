@@ -1,5 +1,5 @@
---- a/options.h
-+++ b/options.h
+--- a/options.h	2015-08-18 04:04:14.136804655 +0300
++++ b/options.h	2015-08-18 04:07:36.362709092 +0300
 @@ -41,7 +41,7 @@
   * Both of these flags can be defined at once, don't compile without at least
   * one of them. */
@@ -9,7 +9,16 @@
  
  /* Setting this disables the fast exptmod bignum code. It saves ~5kB, but is
   * perhaps 20% slower for pubkey operations (it is probably worth experimenting
-@@ -81,7 +81,7 @@ much traffic. */
+@@ -55,7 +55,7 @@
+ #define DROPBEAR_SMALL_CODE
+ 
+ /* Enable X11 Forwarding - server only */
+-#define ENABLE_X11FWD
++/* #define ENABLE_X11FWD */
+ 
+ /* Enable TCP Fowarding */
+ /* 'Local' is "-L" style (client listening port forwarded via server)
+@@ -81,7 +81,7 @@
  
  /* Enable "Netcat mode" option. This will forward standard input/output
   * to a remote TCP-forwarded connection */
@@ -18,7 +27,7 @@
  
  /* Whether to support "-c" and "-m" flags to choose ciphers/MACs at runtime */
  #define ENABLE_USER_ALGO_LIST
-@@ -126,9 +126,9 @@ much traffic. */
+@@ -126,9 +126,9 @@
   * If you disable MD5, Dropbear will fall back to SHA1 fingerprints,
   * which are not the standard form. */
  #define DROPBEAR_SHA1_HMAC
@@ -31,7 +40,16 @@
  #define DROPBEAR_MD5_HMAC
  
  /* You can also disable integrity. Don't bother disabling this if you're
-@@ -184,7 +184,7 @@ much traffic. */
+@@ -141,7 +141,7 @@
+  * Removing either of these won't save very much space.
+  * SSH2 RFC Draft requires dss, recommends rsa */
+ #define DROPBEAR_RSA
+-#define DROPBEAR_DSS
++/*#define DROPBEAR_DSS*/
+ /* ECDSA is significantly faster than RSA or DSS. Compiling in ECC
+  * code (either ECDSA or ECDH) increases binary size - around 30kB
+  * on x86-64 */
+@@ -184,7 +184,7 @@
  
  /* Whether to print the message of the day (MOTD). This doesn't add much code
   * size */
@@ -40,7 +58,25 @@
  
  /* The MOTD file path */
  #ifndef MOTD_FILENAME
-@@ -226,7 +226,7 @@ much traffic. */
+@@ -201,7 +201,7 @@
+  * PAM challenge/response.
+  * You can't enable both PASSWORD and PAM. */
+ 
+-#define ENABLE_SVR_PASSWORD_AUTH
++/*#define ENABLE_SVR_PASSWORD_AUTH*/
+ /* PAM requires ./configure --enable-pam */
+ /*#define ENABLE_SVR_PAM_AUTH */
+ #define ENABLE_SVR_PUBKEY_AUTH
+@@ -209,7 +209,7 @@
+ /* Whether to take public key options in 
+  * authorized_keys file into account */
+ #ifdef ENABLE_SVR_PUBKEY_AUTH
+-#define ENABLE_SVR_PUBKEY_OPTIONS
++/*#define ENABLE_SVR_PUBKEY_OPTIONS*/
+ #endif
+ 
+ #define ENABLE_CLI_PASSWORD_AUTH
+@@ -226,7 +226,7 @@
   * note that it will be provided for all "hidden" client-interactive
   * style prompts - if you want something more sophisticated, use 
   * SSH_ASKPASS instead. Comment out this var to remove this functionality.*/
