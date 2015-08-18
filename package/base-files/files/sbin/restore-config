@@ -1,0 +1,8 @@
+#!/bin/sh
+cd /
+gunzip < /dev/mtd4ro | cpio -iduvH newc
+if [ -f /tmp/random ]; then
+	cat /tmp/random > /dev/urandom
+	rm /tmp/random
+	#echo "Restored entropy."
+fi 

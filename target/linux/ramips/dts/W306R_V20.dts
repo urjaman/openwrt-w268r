@@ -35,7 +35,12 @@
 
 		partition@50000 {
 			label = "firmware";
-			reg = <0x50000 0x1b0000>;
+			reg = <0x50000 0x1a0000>;
+		};
+
+		partition@1f0000 {
+			label = "owrt-config";
+			reg = <0x1f0000 0x10000>;
 		};
 	};
 
