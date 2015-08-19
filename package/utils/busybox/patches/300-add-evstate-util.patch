@@ -1,0 +1,158 @@
+diff --git a/include/applets.src.h b/include/applets.src.h
+index 956810f..425b769 100644
+--- a/include/applets.src.h
++++ b/include/applets.src.h
+@@ -132,6 +132,7 @@ IF_EJECT(APPLET(eject, BB_DIR_USR_BIN, BB_SUID_DROP))
+ IF_ENV(APPLET_NOEXEC(env, env, BB_DIR_USR_BIN, BB_SUID_DROP, env))
+ IF_ENVDIR(APPLET_ODDNAME(envdir, chpst, BB_DIR_USR_BIN, BB_SUID_DROP, envdir))
+ IF_ENVUIDGID(APPLET_ODDNAME(envuidgid, chpst, BB_DIR_USR_BIN, BB_SUID_DROP, envuidgid))
++IF_EVSTATE(APPLET(evstate, BB_DIR_BIN, BB_SUID_DROP))
+ IF_ETHER_WAKE(APPLET_ODDNAME(ether-wake, ether_wake, BB_DIR_USR_SBIN, BB_SUID_DROP, ether_wake))
+ IF_EXPAND(APPLET(expand, BB_DIR_USR_BIN, BB_SUID_DROP))
+ IF_EXPR(APPLET(expr, BB_DIR_USR_BIN, BB_SUID_DROP))
+diff --git a/miscutils/Config.src b/miscutils/Config.src
+index c3655cc..5a4ef26 100644
+--- a/miscutils/Config.src
++++ b/miscutils/Config.src
+@@ -385,6 +385,12 @@ config FEATURE_HDPARM_HDIO_GETSET_DMA
+ 	help
+ 	  Enables the 'hdparm -d' option to get/set using_dma flag.
+ 
++config EVSTATE
++	bool "evstate"
++	default n
++	help
++	  Small utility for reading key state in scripts
++
+ config LOCK
+ 	bool "lock"
+ 	default n
+diff --git a/miscutils/Kbuild.src b/miscutils/Kbuild.src
+index d36a901..c5dae30 100644
+--- a/miscutils/Kbuild.src
++++ b/miscutils/Kbuild.src
+@@ -29,6 +29,7 @@ lib-$(CONFIG_FEATURE_LAST_SMALL)+= last.o
+ lib-$(CONFIG_FEATURE_LAST_FANCY)+= last_fancy.o
+ lib-$(CONFIG_LESS)        += less.o
+ lib-$(CONFIG_LOCK)        += lock.o
++lib-$(CONFIG_EVSTATE)     += evstate.o
+ lib-$(CONFIG_MAKEDEVS)    += makedevs.o
+ lib-$(CONFIG_MAN)         += man.o
+ lib-$(CONFIG_MICROCOM)    += microcom.o
+diff --git a/miscutils/evstate.c b/miscutils/evstate.c
+new file mode 100644
+index 0000000..145f4dd
+--- /dev/null
++++ b/miscutils/evstate.c
+@@ -0,0 +1,111 @@
++/*
++ * evstate: query evdev key/led/sw/snd state
++ * Returns exit code 1 if the state bit is set (key pressed, LED on, etc.),
++ * and 0 if the state bit is unset.
++ *
++ * Copyright (C) 2011 One Laptop per Child
++ * Written by Daniel Drake <dsd@xxxxxxxxxx>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ */
++
++#include <errno.h>
++#include <fcntl.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++#include <unistd.h>
++#include <linux/input.h>
++
++#include "busybox.h"
++#include "libbb.h"
++
++#define BITS_PER_LONG (sizeof(long) * 8)
++
++static int test_bit(unsigned int nr, void *addr)
++{
++	return ((1UL << (nr % BITS_PER_LONG)) &
++		(((unsigned long *) addr)[nr / BITS_PER_LONG])) != 0;
++}
++
++//usage:#define evstate_trivial_usage "<device> <key|led|snd|sw> <keyno>"
++//usage:#define evstate_full_usage ""
++
++static const struct mode {
++	const char *name;
++	int max;
++	int rq;
++} requests[] = {
++	{ "key", KEY_MAX, EVIOCGKEY(KEY_MAX) },
++	{ "led", LED_MAX, EVIOCGLED(LED_MAX) },
++	{ "snd", SND_MAX, EVIOCGSND(SND_MAX) },
++	{ "sw",  SW_MAX, EVIOCGSW(SW_MAX) },
++};
++
++static const struct mode *find_mode(const char *name)
++{
++	int i;
++	for (i = 0; i < sizeof(requests) / sizeof(*requests); i++) {
++		const struct mode *mode = &requests[i];
++		if (strcmp(mode->name, name) == 0)
++			return mode;
++	}
++	return NULL;
++}
++
++static int query_state(const char *device, long int keyno,
++		       const struct mode *mode)
++{
++	uint8_t state[(mode->max / 8) + 1];
++	int fd;
++	int r;
++
++	if (keyno < 0 || keyno > mode->max)
++		bb_error_msg_and_die("Unrecognised key %d", keyno);
++
++	fd = open(device, O_RDONLY);
++	if (fd == -1)
++		bb_error_msg_and_die("cant open %s", device);
++
++	memset(state, 0, sizeof(state));
++	r = ioctl(fd, mode->rq, state);
++	close(fd);
++
++	if (r == -1)
++		bb_error_msg_and_die("ioctl failed");
++
++	return test_bit(keyno, state);
++}
++
++int evstate_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
++int evstate_main(int argc, char **argv)
++{
++	const struct mode *mode;
++	long int keyno;
++
++	if (argc != 4)
++		bb_show_usage();
++
++	mode = find_mode(argv[2]);
++	if (!mode)
++		bb_error_msg_and_die("Unrecognised mode.");
++
++	keyno = strtol(argv[3], NULL, 10);
++	return query_state(argv[1], keyno, mode);
++}
++
