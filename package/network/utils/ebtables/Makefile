@@ -24,7 +24,7 @@ define Package/ebtables
   SECTION:=net
   CATEGORY:=Network
   SUBMENU:=Firewall
-  DEPENDS:=+kmod-ebtables
+  DEPENDS:=
   TITLE:=Ethernet bridge firewall administration utility
   URL:=http://ebtables.sourceforge.net/
 endef
