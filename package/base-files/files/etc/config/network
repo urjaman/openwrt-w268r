@@ -16,8 +16,9 @@ config interface 'lan'
 	option proto 'static'
 	option ipaddr '192.168.0.200'
 	option netmask '255.255.255.0'
+	option gateway '192.168.0.1'
+	option dns '192.168.0.1'
 	option ip6assign '60'
-
 
 config switch
 	option name 'rt305x'
