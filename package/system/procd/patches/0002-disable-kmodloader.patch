@@ -1,0 +1,31 @@
+diff --git a/initd/init.c b/initd/init.c
+index 9818c4f..0c0676b 100644
+--- a/initd/init.c
++++ b/initd/init.c
+@@ -70,8 +70,9 @@ cmdline(void)
+ int
+ main(int argc, char **argv)
+ {
++#if 0
+ 	pid_t pid;
+-
++#endif
+ 	ulog_open(ULOG_KMSG, LOG_DAEMON, "init");
+ 
+ 	sigaction(SIGTERM, &sa_shutdown, NULL);
+@@ -82,6 +83,7 @@ main(int argc, char **argv)
+ 	cmdline();
+ 	watchdog_init(1);
+ 
++#if 0
+ 	pid = fork();
+ 	if (!pid) {
+ 		char *kmod[] = { "/sbin/kmodloader", "/etc/modules-boot.d/", NULL };
+@@ -113,6 +115,7 @@ main(int argc, char **argv)
+ 			watchdog_ping();
+ 		}
+ 	}
++#endif
+ 	uloop_init();
+ 	preinit();
+ 	uloop_run();

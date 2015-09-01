@@ -106,7 +106,7 @@ define BuildKernel
 	touch $$@
 
   $(LINUX_DIR)/.modules: $(STAMP_CONFIGURED) $(LINUX_DIR)/.config FORCE
-	$(Kernel/CompileModules)
+	-$(Kernel/CompileModules)
 	touch $$@
 
   $(LINUX_DIR)/.image: $(STAMP_CONFIGURED) $(if $(CONFIG_STRIP_KERNEL_EXPORTS),$(KERNEL_BUILD_DIR)/symtab.h) FORCE
