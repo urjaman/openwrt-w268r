@@ -129,6 +129,7 @@ get_status_led() {
 		status_led="$board:green:wifi"
 		;;
 	pbr-m1|\
+	w268r|\
 	w306r-v20|\
 	zbt-wr8305rt)
 		status_led="$board:green:sys"

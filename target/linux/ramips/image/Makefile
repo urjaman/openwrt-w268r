@@ -604,6 +604,8 @@ Image/Build/Profile/W150M=$(call BuildFirmware/CustomFlashFactory/$(1),$(1),w150
 
 Image/Build/Profile/W306R_V20=$(call BuildFirmware/CustomFlashFactory/$(1),$(1),w306r-v20,W306R_V20,$(ralink_default_fw_size_4M),linkn Kernel Image,factory)
 
+Image/Build/Profile/W268R=$(call BuildFirmware/CustomFlashFactory/$(1),$(1),w268r,W268R,$(ralink_default_fw_size_4M),linkn Kernel Image,factory)
+
 Image/Build/Profile/W502U=$(call BuildFirmware/Default8M/$(1),$(1),w502u,W502U)
 
 Image/Build/Profile/WCR150GN=$(call BuildFirmware/Default4M/$(1),$(1),wcr150gn,WCR150GN)
@@ -759,6 +761,7 @@ define Image/Build/Profile/Default
 	$(call Image/Build/Profile/VOCORE,$(1))
 	$(call Image/Build/Profile/W150M,$(1))
 	$(call Image/Build/Profile/W306R_V20,$(1))
+	$(call Image/Build/Profile/W268R,$(1))
 	$(call Image/Build/Profile/W502U,$(1))
 	$(call Image/Build/Profile/WCR150GN,$(1))
 	$(call Image/Build/Profile/WHRG300N,$(1))

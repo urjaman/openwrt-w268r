@@ -102,6 +102,7 @@ platform_check_image() {
 	vocore|\
 	w150m|\
 	w306r-v20|\
+	w268r|\
 	w502u|\
 	whr-1166d|\
 	whr-300hp2|\
