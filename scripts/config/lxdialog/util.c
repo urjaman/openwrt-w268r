@@ -322,10 +322,6 @@ int init_dialog(const char *backtitle)
 	getyx(stdscr, saved_y, saved_x);
 
 	getmaxyx(stdscr, height, width);
-	if (height < WINDOW_HEIGTH_MIN || width < WINDOW_WIDTH_MIN) {
-		endwin();
-		return -ERRDISPLAYTOOSMALL;
-	}
 
 	dlg.backtitle = backtitle;
 	color_setup(getenv("MENUCONFIG_COLOR"));
