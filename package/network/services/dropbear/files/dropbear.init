@@ -37,7 +37,6 @@ validate_section_dropbear()
 		'RootPasswordAuth:bool:1' \
 		'RootLogin:bool:1' \
 		'rsakeyfile:file' \
-		'dsskeyfile:file' \
 		'BannerFile:file' \
 		'Port:list(port):22' \
 		'SSHKeepAlive:uinteger:300' \
@@ -49,7 +48,7 @@ dropbear_instance()
 {
 	local PasswordAuth enable Interface GatewayPorts \
 		RootPasswordAuth RootLogin rsakeyfile \
-		dsskeyfile BannerFile Port SSHKeepAlive IdleTimeout \
+		BannerFile Port SSHKeepAlive IdleTimeout \
 		mdns ipaddrs
 
 	validate_section_dropbear "${1}" || {
@@ -80,11 +79,13 @@ dropbear_instance()
 	[ "${IdleTimeout}" -ne 0 ] && procd_append_param command -I "${IdleTimeout}"
 	[ "${SSHKeepAlive}" -ne 0 ] && procd_append_param command -K "${SSHKeepAlive}"
 	[ "${mdns}" -ne 0 ] && procd_add_mdns "ssh" "tcp" "$Port" "daemon=dropbear"
+	procd_set_param respawn
 	procd_close_instance
 }
 
 start_service()
 {
+	chown root /etc/dropbear
 	chmod 0700 /etc/dropbear
 	chmod 0600 /etc/dropbear/dropbear_rsa_host_key
 	chmod 0600 /root/.ssh/id_dropbear

@@ -4,7 +4,7 @@
 
 [ -z "$PREINIT" ] && exec /sbin/init
 
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
 
 pi_ifname=
 pi_ip=192.168.1.1

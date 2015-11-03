@@ -1,7 +1,7 @@
-From 510d194d2dbfafc448fc82f9d74a676f75e96323 Mon Sep 17 00:00:00 2001
+From 04e299dffec7ed7c7d88fe8568a6833005dd9558 Mon Sep 17 00:00:00 2001
 From: Gordon Hollingworth <gordon@raspberrypi.org>
 Date: Tue, 12 May 2015 14:47:56 +0100
-Subject: [PATCH 069/148] rpi-ft5406: Add touchscreen driver for pi LCD display
+Subject: [PATCH 069/203] rpi-ft5406: Add touchscreen driver for pi LCD display
 
 ---
  drivers/input/touchscreen/Kconfig             |   7 +

@@ -46,6 +46,8 @@ ramips_setup_interfaces()
 	dcs-930|\
 	dcs-930l-b1|\
 	ht-tm02|\
+	linkits7688 | \
+	linkits7688d | \
 	microwrt|\
 	ncs601w|\
 	w150m|\
@@ -61,6 +63,7 @@ ramips_setup_interfaces()
 		;;
 	3g-6200n|\
 	ai-br100|\
+	db-wrt01|\
 	dir-300-b7|\
 	dir-320-b1|\
 	dir-610-a1|\
@@ -80,7 +83,8 @@ ramips_setup_interfaces()
 	wsr-1166|\
 	wsr-600|\
 	wt1520|\
-	y1)
+	y1|\
+	zbt-wg2626)
 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
 		ucidef_add_switch "switch0" "1" "1"
 		ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 6t"
@@ -101,7 +105,8 @@ ramips_setup_interfaces()
 		ucidef_add_switch_vlan "switch0" "2" "4 5t"
 		;;
 	asl26555|\
-	re6500)
+	re6500|\
+	rp-n53)
 		ucidef_set_interface_lan "eth0.1"
 		ucidef_add_switch "switch0" "1" "1"
 		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
@@ -169,6 +174,13 @@ ramips_setup_interfaces()
 		ucidef_add_switch_vlan "switch1" "1" "0 1 2 3 6t"
 		ucidef_add_switch_vlan "switch1" "2" "4 6t"
 		;;
+	hc5*61|\
+	y1s)
+		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
+		ucidef_add_switch "switch0" "1" "1"
+		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 5 6t"
+		ucidef_add_switch_vlan "switch0" "2" "0 6t"
+		;;
 	m2m)
 		ucidef_add_switch "switch0" "4"
 		ucidef_set_interface_lan "eth0"
@@ -217,10 +229,10 @@ ramips_setup_interfaces()
 		ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 6t"
 		ucidef_add_switch_vlan "switch0" "2" "5 6t"
 		;;
-	y1s)
+	wizfi630a)
 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
 		ucidef_add_switch "switch0" "1" "1"
-		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 5 6t"
+		ucidef_add_switch_vlan "switch0" "1" "1 2 6t"
 		ucidef_add_switch_vlan "switch0" "2" "0 6t"
 		;;
 	zbt-wr8305rt)
@@ -286,8 +298,18 @@ ramips_setup_macs()
 	e1700)
 		wan_mac=$(mtd_get_mac_ascii config WAN_MAC_ADDR)
 		;;
+	hc5*61)
+		lan_mac=`mtd_get_mac_ascii bdinfo "Vfac_mac "`
+		[ -n "$lan_mac" ] || lan_mac=$(cat /sys/class/net/eth0/address)
+		wan_mac=$(macaddr_add "$lan_mac" 1)
+		;;
 	ht-tm02)
 		lan_mac=$(cat /sys/class/net/eth0/address)
+		;;
+	linkits7688 | \
+	linkits7688d)
+		wan_mac=$(mtd_get_mac_binary factory 4)
+		lan_mac=$(mtd_get_mac_binary factory 46)
 		;;
 	m3|\
 	m4|\
@@ -313,6 +335,10 @@ ramips_setup_macs()
 		lan_mac=$(cat /sys/class/net/eth0/address)
 		wan_mac=$(macaddr_add "$lan_mac" 4)
 		;;
+	tiny-ac)
+		lan_mac=$(mtd_get_mac_ascii u-boot-env LAN_MAC_ADDR)
+		wan_mac=$(mtd_get_mac_ascii u-boot-env WAN_MAC_ADDR)
+		;;
 	w268r|\
 	w306r-v20)
 		lan_mac=$(cat /sys/class/net/eth0/address)
@@ -327,6 +353,10 @@ ramips_setup_macs()
 	wsr-600)
 		wan_mac=$(mtd_get_mac_binary factory 4)
 		lan_mac=$wan_mac
+		;;
+	wizfi630a)
+		lan_mac=$(mtd_get_mac_binary factory 4)
+		wan_mac=$(mtd_get_mac_binary factory 40)
 		;;
 	wsr-1166)
 		local index="$(find_mtd_index "board_data")"

@@ -97,6 +97,9 @@ ramips_board_detect() {
 	*"DAP-1350")
 		name="dap-1350"
 		;;
+	*"DB-WRT01")
+		name="db-wrt01"
+		;;
 	*"DCS-930")
 		name="dcs-930"
 		;;
@@ -142,6 +145,9 @@ ramips_board_detect() {
 	*"DIR-860L B1")
 		name="dir-860l-b1"
 		;;
+	*"Dovado Tiny AC")
+		name="tiny-ac"
+		;;
 	*"E1700")
 		name="e1700"
 		;;
@@ -166,6 +172,15 @@ ramips_board_detect() {
 	*"FreeStation5")
 		name="freestation5"
 		;;
+	*"HC5661")
+		name="hc5661"
+		;;
+	*"HC5761")
+		name="hc5761"
+		;;
+	*"HC5861")
+		name="hc5861"
+		;;
 	*"HG255D")
 		name="hg255d"
 		;;
@@ -189,6 +204,15 @@ ramips_board_detect() {
 		;;
 	*"M4")
 		name="m4"
+		;;
+	*"MediaTek LinkIt Smart7688")
+		linkit="$(dd bs=1 skip=1024 count=12 if=/dev/mtd2 2> /dev/null)"
+		if [ "${linkit}" = "LINKITS7688D" ]; then
+			name="linkits7688d"
+			RAMIPS_MODEL="${machine} DUO"
+		else
+			name="linkits7688"
+		fi
 		;;
 	*"Memory 2 Move")
 		name="m2m"
@@ -370,6 +394,9 @@ ramips_board_detect() {
 	*"WIZARD 8800")
 		name="wizard8800"
 		;;
+	*"WizFi630A")
+		name="wizfi630a"
+		;;                
 	*"WL-330N")
 		name="wl-330n"
 		;;
@@ -429,6 +456,9 @@ ramips_board_detect() {
 		;;
 	*"ZBT-WA05")
 		name="zbt-wa05"
+		;;
+	*"ZBT-WG2626")
+		name="zbt-wg2626"
 		;;
 	*"ZBT-WR8305RT")
 		name="zbt-wr8305rt"

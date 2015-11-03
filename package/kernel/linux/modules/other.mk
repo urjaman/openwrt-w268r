@@ -78,6 +78,25 @@ endef
 
 $(eval $(call KernelPackage,bluetooth))
 
+define KernelPackage/ath3k
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=ATH3K Kernel Module support
+  DEPENDS:=+kmod-bluetooth +ar3k-firmware
+  KCONFIG:= \
+	CONFIG_BT_ATH3K \
+	CONFIG_BT_HCIUART_ATH3K=y
+  $(call AddDepends/bluetooth)
+  FILES:= \
+	$(LINUX_DIR)/drivers/bluetooth/ath3k.ko
+  AUTOLOAD:=$(call AutoProbe,ath3k)
+endef
+
+define KernelPackage/ath3k/description
+ Kernel support for ATH3K Module
+endef
+
+$(eval $(call KernelPackage,ath3k))
+
 
 define KernelPackage/bluetooth_6lowpan
   SUBMENU:=$(OTHER_MENU)
@@ -360,21 +379,6 @@ define KernelPackage/sdhci/description
 endef
 
 $(eval $(call KernelPackage,sdhci))
-
-
-define KernelPackage/oprofile
-  SUBMENU:=$(OTHER_MENU)
-  TITLE:=OProfile profiling support
-  KCONFIG:=CONFIG_OPROFILE
-  FILES:=$(LINUX_DIR)/arch/$(LINUX_KARCH)/oprofile/oprofile.ko
-  DEPENDS:=@KERNEL_PROFILING
-endef
-
-define KernelPackage/oprofile/description
- Kernel module for support for oprofile system profiling
-endef
-
-$(eval $(call KernelPackage,oprofile))
 
 
 define KernelPackage/rfkill

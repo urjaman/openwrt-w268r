@@ -107,17 +107,20 @@ tplink_board_detect() {
 	"015300"*)
 		model="EasyLink EL-MINI"
 		;;
-	"04440001"*)
-		model="BITMAIN ANTMINER S1"
+	"044401"*)
+		model="ANTMINER-S1"
 		;;
-	"04440003"*)
-		model="BITMAIN ANTMINER S3"
+	"044403"*)
+		model="ANTMINER-S3"
 		;;
 	"120000"*)
 		model="MERCURY MAC1200R"
 		;;
 	"3C0001"*)
 		model="OOLITE"
+		;;
+	"3C0002"*)
+		model="MINIBOX_V1"
 		;;
 	"070300"*)
 		model="TP-Link TL-WR703N"
@@ -220,6 +223,9 @@ tplink_board_detect() {
 		;;
 	"342000"*)
 		model="TP-Link TL-MR3420"
+		;;
+	"332000"*)
+		model="TP-Link TL-WDR3320"
 		;;
 	"350000"*)
 		model="TP-Link TL-WDR3500"
@@ -326,6 +332,9 @@ ar71xx_board_detect() {
 	*"AirGateway")
 		name="airgateway"
 		;;
+	*"AirGateway Pro")
+		name="airgatewaypro"
+		;;
 	*"AirRouter")
 		name="airrouter"
 		;;
@@ -343,6 +352,12 @@ ar71xx_board_detect() {
 		;;
 	*ALL0315N)
 		name="all0315n"
+		;;
+	*Antminer-S1)
+		name="antminer-s1"
+		;;
+	*Antminer-S3)
+		name="antminer-s3"
 		;;
 	*AP113)
 		name="ap113"
@@ -371,6 +386,9 @@ ar71xx_board_detect() {
 	*"AP147-010 reference board")
 		name="ap147-010"
 		;;
+	*"AP152 reference board")
+		name="ap152"
+		;;
 	*AP81)
 		name="ap81"
 		;;
@@ -391,6 +409,9 @@ ar71xx_board_detect() {
 		;;
 	*CAP4200AG)
 		name="cap4200ag"
+		;;
+	*"COMFAST CF-E316N v2")
+		name="cf-e316n-v2"
 		;;
 	*"CPE210/220/510/520")
 		name="cpe510"
@@ -502,6 +523,9 @@ ar71xx_board_detect() {
 	*"MAC1200R")
 		name="mc-mac1200r"
 		;;
+	*"MiniBox V1.0")
+		name="minibox-v1"
+		;;
 	*MR12)
 		name="mr12"
 		;;
@@ -510,6 +534,9 @@ ar71xx_board_detect() {
 		;;
 	*MR600v2)
 		name="mr600v2"
+		;;
+	*MR1750)
+		name="mr1750"
 		;;
 	*MR600)
 		name="mr600"
@@ -763,6 +790,9 @@ ar71xx_board_detect() {
 	*"TL-WA901ND v3")
 		name="tl-wa901nd-v3"
 		;;
+	*"TL-WDR3320 v2")
+		name="tl-wdr3320-v2"
+		;;
 	*"TL-WDR3500")
 		name="tl-wdr3500"
 		;;
@@ -831,6 +861,9 @@ ar71xx_board_detect() {
 		;;
 	*"UniFi AP Pro")
 		name="uap-pro"
+		;;
+	"WeIO"*)
+		name="weio"
 		;;
 	*WHR-G301N)
 		name="whr-g301n"

@@ -1,7 +1,7 @@
-From e9b92372565ede53c177c0edb5417d59c5c5b732 Mon Sep 17 00:00:00 2001
+From 63e7ed7e81a19be754aa1515835599b9d97b3467 Mon Sep 17 00:00:00 2001
 From: Phil Elwell <phil@raspberrypi.org>
 Date: Mon, 22 Jun 2015 14:21:55 +0100
-Subject: [PATCH 089/148] BCM270X_DT: Sort nodes by bus address, and
+Subject: [PATCH 089/203] BCM270X_DT: Sort nodes by bus address, and
  consolidate aliases
 
 ---

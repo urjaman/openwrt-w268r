@@ -36,6 +36,7 @@ platform_check_image() {
 	cf-wr800n|\
 	d105|\
 	dap-1350|\
+	db-wrt01|\
 	dcs-930|\
 	dcs-930l-b1|\
 	dir-300-b1|\
@@ -54,12 +55,15 @@ platform_check_image() {
 	firewrt|\
 	fonera20n|\
 	freestation5|\
+	hc5*61|\
 	hg255d|\
 	hlk-rm04|\
 	hpm|\
 	ht-tm02|\
 	hw550-3g|\
 	ip2202|\
+	linkits7688|\
+	linkits7688d|\
 	m2m|\
 	m3|\
 	m4|\
@@ -96,6 +100,7 @@ platform_check_image() {
 	sl-r7205|\
 	tew-691gr|\
 	tew-692gr|\
+	tiny-ac|\
 	ur-326n4g|\
 	ur-336un|\
 	v22rw-2x2|\
@@ -108,6 +113,7 @@ platform_check_image() {
 	whr-300hp2|\
 	whr-600d|\
 	whr-g300n|\
+	wizfi630a|\
 	wl-330n|\
 	wl-330n3g|\
 	wl-341v3|\
@@ -127,6 +133,7 @@ platform_check_image() {
 	y1|\
 	y1s|\
 	zbt-wa05|\
+	zbt-wg2626|\
 	zbt-wr8305rt|\
 	zte-q7)
 		[ "$magic" != "27051956" ] && {
@@ -197,4 +204,9 @@ disable_watchdog() {
 	}
 }
 
+blink_led() {
+	. /etc/diag.sh; set_state upgrade
+}
+
 append sysupgrade_pre_upgrade disable_watchdog
+append sysupgrade_pre_upgrade blink_led
