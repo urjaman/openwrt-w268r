@@ -205,7 +205,7 @@ ramips_board_detect() {
 	*"M4")
 		name="m4"
 		;;
-	*"MediaTek LinkIt Smart7688")
+	*"MediaTek LinkIt Smart 7688")
 		linkit="$(dd bs=1 skip=1024 count=12 if=/dev/mtd2 2> /dev/null)"
 		if [ "${linkit}" = "LINKITS7688D" ]; then
 			name="linkits7688d"
@@ -349,6 +349,9 @@ ramips_board_detect() {
 	*"TEW-692GR")
 		name="tew-692gr"
 		;;
+	*"UBNT-ERX")
+		name="ubnt-erx"
+		;;
 	*"UR-326N4G")
 		name="ur-326n4g"
 		;;
@@ -379,6 +382,9 @@ ramips_board_detect() {
 	*"WCR-150GN")
 		name="wcr-150gn"
 		;;
+	*"WF-2881")
+		name="wf-2881"
+		;;
 	*"WHR-1166D")
 		name="whr-1166d"
 		;;
@@ -391,12 +397,15 @@ ramips_board_detect() {
 	*"WHR-G300N")
 		name="whr-g300n"
 		;;
+	*"WiTi")
+                name="witi"
+		;;
 	*"WIZARD 8800")
 		name="wizard8800"
 		;;
 	*"WizFi630A")
 		name="wizfi630a"
-		;;                
+		;;
 	*"WL-330N")
 		name="wl-330n"
 		;;
@@ -426,6 +435,12 @@ ramips_board_detect() {
 		;;
 	*"WRTNODE")
 		name="wrtnode"
+		;;
+	*"WRTnode2R")
+		name="wrtnode2r"
+		;;
+	*"WRTnode2P")
+		name="wrtnode2p"
 		;;
 	*"WSR-1166DHP")
 		name="wsr-1166"
@@ -462,6 +477,9 @@ ramips_board_detect() {
 		;;
 	*"ZBT-WR8305RT")
 		name="zbt-wr8305rt"
+		;;
+	*"YK1")
+		name="youku-yk1"
 		;;
 	*)
 		name="generic"

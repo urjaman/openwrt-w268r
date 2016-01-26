@@ -476,7 +476,7 @@ $(eval $(call KernelPackage,usb2-pci))
 
 define KernelPackage/usb-dwc2
   TITLE:=DWC2 USB controller driver
-  DEPENDS:=+(TARGET_brcm2708||TARGET_at91||TARGET_brcm63xx||TARGET_mxs||TARGET_imx6):kmod-usb-gadget
+  DEPENDS:=+(TARGET_brcm2708||TARGET_at91||TARGET_brcm63xx||TARGET_mxs||TARGET_imx6||TARGET_omap):kmod-usb-gadget
   KCONFIG:= \
 	CONFIG_USB_DWC2 \
 	CONFIG_USB_DWC2_PCI \
@@ -487,8 +487,8 @@ define KernelPackage/usb-dwc2
 	CONFIG_USB_DWC2_DEBUG_PERIODIC=n
   FILES:= \
 	$(LINUX_DIR)/drivers/usb/dwc2/dwc2.ko \
-	$(LINUX_DIR)/drivers/usb/dwc2/dwc2_platform.ko
-  AUTOLOAD:=$(call AutoLoad,54,dwc2 dwc2_platform,1)
+	$(LINUX_DIR)/drivers/usb/dwc2/dwc2_platform.ko@lt4.3
+  AUTOLOAD:=$(call AutoLoad,54,dwc2 dwc2_platform@lt4.3,1)
   $(call AddDepends/usb)
 endef
 
@@ -1313,6 +1313,21 @@ define KernelPackage/usb-net-rtl8152/description
 endef
 
 $(eval $(call KernelPackage,usb-net-rtl8152))
+
+
+define KernelPackage/usb-net-sr9700
+  TITLE:=Support for CoreChip SR9700 ethernet devices
+  KCONFIG:=CONFIG_USB_NET_SR9700
+  FILES:=$(LINUX_DIR)/drivers/$(USBNET_DIR)/sr9700.ko
+  AUTOLOAD:=$(call AutoProbe,sr9700)
+  $(call AddDepends/usb-net)
+endef
+
+define KernelPackage/usb-net-sr9700/description
+ Kernel module for CoreChip-sz SR9700 based USB 1.1 10/100 ethernet devices
+endef
+
+$(eval $(call KernelPackage,usb-net-sr9700))
 
 
 define KernelPackage/usb-net-rndis

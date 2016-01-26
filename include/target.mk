@@ -12,7 +12,7 @@ __target_inc=1
 DEVICE_TYPE?=router
 
 # Default packages - the really basic set
-DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fstools
+DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fstools uclient-fetch
 # For nas targets
 DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
 # For router targets
@@ -244,6 +244,7 @@ ifeq ($(DUMP),1)
       CPU_CFLAGS_neon = -mfpu=neon
       CPU_CFLAGS_vfp = -mfpu=vfp
       CPU_CFLAGS_vfpv3 = -mfpu=vfpv3-d16
+      CPU_CFLAGS_neon-vfpv4 = -mfpu=neon-vfpv4
     endif
   endif
   ifeq ($(ARCH),powerpc)
@@ -259,6 +260,11 @@ ifeq ($(DUMP),1)
   ifeq ($(ARCH),aarch64)
     CPU_TYPE ?= armv8-a
     CPU_CFLAGS_armv8-a = -mcpu=armv8-a
+  endif
+  ifeq ($(ARCH),arc)
+    CPU_TYPE ?= arc700
+    CPU_CFLAGS += -matomic
+    CPU_CFLAGS_arc700 = -marc700
   endif
   DEFAULT_CFLAGS=$(strip $(CPU_CFLAGS) $(CPU_CFLAGS_$(CPU_TYPE)) $(CPU_CFLAGS_$(CPU_SUBTYPE)))
 endif

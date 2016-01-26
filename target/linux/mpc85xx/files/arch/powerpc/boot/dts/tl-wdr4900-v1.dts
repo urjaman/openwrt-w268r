@@ -37,7 +37,7 @@
 			flash@0 {
 				#address-cells = <1>;
 				#size-cells = <1>;
-				compatible = "spansion,s25fl129p1";
+				compatible = "jedec,spi-nor";
 				reg = <0>;
 				spi-max-frequency = <25000000>;
 
@@ -144,6 +144,19 @@
 
 		can1: can@1d000 {
 			status = "disabled";
+		};
+
+		ptp_clock@b0e00 {
+			compatible = "fsl,etsec-ptp";
+			reg = <0xb0e00 0xb0>;
+			interrupts = <68 2 0 0 69 2 0 0 70 2 0 0>;
+			fsl,cksel       = <1>;
+			fsl,tclk-period	= <5>;
+			fsl,tmr-prsc	= <2>;
+			fsl,tmr-add	= <0xcccccccd>;
+			fsl,tmr-fiper1	= <0x3b9ac9fb>; /* 1PPS */
+			fsl,tmr-fiper2	= <0x00018696>;
+			fsl,max-adj	= <249999999>;
 		};
 	};
 

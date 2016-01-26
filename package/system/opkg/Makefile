@@ -41,6 +41,7 @@ define Package/opkg/Default
   SECTION:=base
   CATEGORY:=Base system
   TITLE:=opkg package manager
+  DEPENDS:=+uclient-fetch
   URL:=http://wiki.openmoko.org/wiki/Opkg
 endef
 
@@ -85,7 +86,6 @@ endef
 
 Package/opkg-smime/conffiles = $(Package/opkg/conffiles)
 
-TARGET_CFLAGS += $(if $(CONFIG_GCC_VERSION_4_3)$(CONFIG_GCC_VERSION_4_4),-Wno-array-bounds)
 TARGET_CFLAGS += -ffunction-sections -fdata-sections
 EXTRA_CFLAGS += $(TARGET_CPPFLAGS)
 

@@ -27,7 +27,7 @@ define KernelPackage/crypto-aead
 	CONFIG_CRYPTO_AEAD2
   FILES:=$(LINUX_DIR)/crypto/aead.ko
   AUTOLOAD:=$(call AutoLoad,09,aead,1)
-  $(call AddDepends/crypto)
+  $(call AddDepends/crypto, +LINUX_4_3:kmod-crypto-null +LINUX_4_4:kmod-crypto-null)
 endef
 
 $(eval $(call KernelPackage,crypto-aead))
@@ -100,26 +100,25 @@ $(eval $(call KernelPackage,crypto-wq))
 
 define KernelPackage/crypto-rng
   TITLE:=CryptoAPI random number generation
-  KCONFIG:=CONFIG_CRYPTO_RNG2
-  FILES:=$(LINUX_DIR)/crypto/rng.ko
-ifeq ($(strip $(call CompareKernelPatchVer,$(KERNEL_PATCHVER),lt,4.2.0)),1)
-  FILES+=$(LINUX_DIR)/crypto/krng.ko
-endif
-  AUTOLOAD:=$(call AutoLoad,09,rng krng)
+  DEPENDS:=+kmod-crypto-hash +kmod-crypto-hmac +kmod-crypto-sha256
+  KCONFIG:= \
+	CONFIG_CRYPTO_DRBG \
+	CONFIG_CRYPTO_DRBG_HMAC=y \
+	CONFIG_CRYPTO_DRBG_HASH=n \
+	CONFIG_CRYPTO_DRBG_MENU \
+	CONFIG_CRYPTO_JITTERENTROPY \
+	CONFIG_CRYPTO_RNG2
+  FILES:= \
+	$(LINUX_DIR)/crypto/drbg.ko@ge4.2 \
+	$(LINUX_DIR)/crypto/jitterentropy_rng.ko@ge4.2 \
+	$(LINUX_DIR)/crypto/krng.ko@lt4.2 \
+	$(LINUX_DIR)/crypto/rng.ko
+  AUTOLOAD:=$(call AutoLoad,09,drbg@ge4.2 jitterentropy_rng@ge4.2 krng@lt4.2 rng)
   $(call AddDepends/crypto)
 endef
 
 $(eval $(call KernelPackage,crypto-rng))
 
-define KernelPackage/crypto-rng-jitterentropy
-  TITLE:=Jitterentropy Non-Deterministic Random Number Generator
-  KCONFIG:=CONFIG_CRYPTO_JITTERENTROPY
-  FILES:= $(LINUX_DIR)/crypto/jitterentropy_rng.ko
-  AUTOLOAD:=$(call AutoLoad,10,jitterentropy-rng)
-  $(call AddDepends/crypto)
-endef
-
-$(eval $(call KernelPackage,crypto-rng-jitterentropy))
 
 define KernelPackage/crypto-iv
   TITLE:=CryptoAPI initialization vectors
@@ -177,6 +176,24 @@ define KernelPackage/crypto-hw-padlock
 endef
 
 $(eval $(call KernelPackage,crypto-hw-padlock))
+
+
+define KernelPackage/crypto-hw-ccp
+  TITLE:=AMD Cryptographic Coprocessor
+  DEPENDS:=+kmod-crypto-authenc +kmod-crypto-hash +kmod-crypto-manager +kmod-random-core
+  KCONFIG:= \
+	CONFIG_CRYPTO_HW=y \
+	CONFIG_CRYPTO_DEV_CCP=y \
+	CONFIG_CRYPTO_DEV_CCP_CRYPTO \
+	CONFIG_CRYPTO_DEV_CCP_DD
+  FILES:= \
+	$(LINUX_DIR)/drivers/crypto/ccp/ccp.ko \
+	$(LINUX_DIR)/drivers/crypto/ccp/ccp-crypto.ko
+  AUTOLOAD:=$(call AutoLoad,09,ccp ccp-crypto)
+  $(call AddDepends/crypto)
+endef
+
+$(eval $(call KernelPackage,crypto-hw-ccp))
 
 
 define KernelPackage/crypto-hw-geode
@@ -258,7 +275,7 @@ $(eval $(call KernelPackage,crypto-hw-omap))
 
 define KernelPackage/crypto-authenc
   TITLE:=Combined mode wrapper for IPsec
-  DEPENDS:=+kmod-crypto-manager
+  DEPENDS:=+kmod-crypto-manager +LINUX_4_4:kmod-crypto-null
   KCONFIG:=CONFIG_CRYPTO_AUTHENC
   FILES:=$(LINUX_DIR)/crypto/authenc.ko
   AUTOLOAD:=$(call AutoLoad,09,authenc)
@@ -442,10 +459,17 @@ $(eval $(call KernelPackage,crypto-md4))
 define KernelPackage/crypto-md5
   TITLE:=MD5 digest CryptoAPI module
   DEPENDS:=+kmod-crypto-hash
-  KCONFIG:=CONFIG_CRYPTO_MD5
+  KCONFIG:= \
+	CONFIG_CRYPTO_MD5 \
+	CONFIG_CRYPTO_MD5_OCTEON
   FILES:=$(LINUX_DIR)/crypto/md5.ko
   AUTOLOAD:=$(call AutoLoad,09,md5)
   $(call AddDepends/crypto)
+endef
+
+define KernelPackage/crypto-md5/octeon
+  FILES+=$(LINUX_DIR)/arch/mips/cavium-octeon/crypto/octeon-md5.ko
+  AUTOLOAD:=$(call AutoLoad,09,octeon-md5)
 endef
 
 $(eval $(call KernelPackage,crypto-md5))
@@ -466,10 +490,17 @@ $(eval $(call KernelPackage,crypto-michael-mic))
 define KernelPackage/crypto-sha1
   TITLE:=SHA1 digest CryptoAPI module
   DEPENDS:=+kmod-crypto-hash
-  KCONFIG:=CONFIG_CRYPTO_SHA1
+  KCONFIG:= \
+	CONFIG_CRYPTO_SHA1 \
+	CONFIG_CRYPTO_SHA1_OCTEON
   FILES:=$(LINUX_DIR)/crypto/sha1_generic.ko
   AUTOLOAD:=$(call AutoLoad,09,sha1_generic)
   $(call AddDepends/crypto)
+endef
+
+define KernelPackage/crypto-sha1/octeon
+  FILES+=$(LINUX_DIR)/arch/mips/cavium-octeon/crypto/octeon-sha1.ko
+  AUTOLOAD:=$(call AutoLoad,09,octeon-sha1)
 endef
 
 $(eval $(call KernelPackage,crypto-sha1))
@@ -478,13 +509,39 @@ $(eval $(call KernelPackage,crypto-sha1))
 define KernelPackage/crypto-sha256
   TITLE:=SHA224 SHA256 digest CryptoAPI module
   DEPENDS:=+kmod-crypto-hash
-  KCONFIG:=CONFIG_CRYPTO_SHA256
+  KCONFIG:= \
+	CONFIG_CRYPTO_SHA256 \
+	CONFIG_CRYPTO_SHA256_OCTEON
   FILES:=$(LINUX_DIR)/crypto/sha256_generic.ko
   AUTOLOAD:=$(call AutoLoad,09,sha256_generic)
   $(call AddDepends/crypto)
 endef
 
+define KernelPackage/crypto-sha256/octeon
+  FILES+=$(LINUX_DIR)/arch/mips/cavium-octeon/crypto/octeon-sha256.ko
+  AUTOLOAD:=$(call AutoLoad,09,octeon-sha256)
+endef
+
 $(eval $(call KernelPackage,crypto-sha256))
+
+
+define KernelPackage/crypto-sha512
+  TITLE:=SHA512 digest CryptoAPI module
+  DEPENDS:=+kmod-crypto-hash
+  KCONFIG:= \
+	CONFIG_CRYPTO_SHA512 \
+	CONFIG_CRYPTO_SHA512_OCTEON
+  FILES:=$(LINUX_DIR)/crypto/sha512_generic.ko
+  AUTOLOAD:=$(call AutoLoad,09,sha512_generic)
+  $(call AddDepends/crypto)
+endef
+
+define KernelPackage/crypto-sha512/octeon
+  FILES+=$(LINUX_DIR)/arch/mips/cavium-octeon/crypto/octeon-sha512.ko
+  AUTOLOAD:=$(call AutoLoad,09,octeon-sha512)
+endef
+
+$(eval $(call KernelPackage,crypto-sha512))
 
 
 define KernelPackage/crypto-misc
@@ -499,7 +556,6 @@ define KernelPackage/crypto-misc
 	CONFIG_CRYPTO_FCRYPT \
 	CONFIG_CRYPTO_KHAZAD \
 	CONFIG_CRYPTO_SERPENT \
-	CONFIG_CRYPTO_SHA512 \
 	CONFIG_CRYPTO_TEA \
 	CONFIG_CRYPTO_TGR192 \
 	CONFIG_CRYPTO_TWOFISH \
@@ -513,7 +569,6 @@ define KernelPackage/crypto-misc
 	$(LINUX_DIR)/crypto/cast5_generic.ko \
 	$(LINUX_DIR)/crypto/cast6_generic.ko \
 	$(LINUX_DIR)/crypto/khazad.ko \
-	$(LINUX_DIR)/crypto/sha512_generic.ko \
 	$(LINUX_DIR)/crypto/tea.ko \
 	$(LINUX_DIR)/crypto/tgr192.ko \
 	$(LINUX_DIR)/crypto/twofish_common.ko \
@@ -587,7 +642,7 @@ define KernelPackage/crypto-null
   KCONFIG:=CONFIG_CRYPTO_NULL
   FILES:=$(LINUX_DIR)/crypto/crypto_null.ko
   AUTOLOAD:=$(call AutoLoad,09,crypto_null)
-  $(call AddDepends/crypto,+kmod-crypto-manager)
+  $(call AddDepends/crypto, +kmod-crypto-hash)
 endef
 
 $(eval $(call KernelPackage,crypto-null))
