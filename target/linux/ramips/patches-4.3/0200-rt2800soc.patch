@@ -1,0 +1,21 @@
+--- a/drivers/net/wireless/rt2x00/rt2800soc.c	2016-02-14 01:39:27.220000005 +0200
++++ b/drivers/net/wireless/rt2x00/rt2800soc.c	2016-02-14 01:40:45.523333342 +0200
+@@ -241,10 +241,18 @@
+ 	return rt2x00soc_probe(pdev, &rt2800soc_ops);
+ }
+ 
++static const struct of_device_id rt2880_wmac_match[] = {
++	{ .compatible = "ralink,rt2880-wmac" },
++	{},
++};
++
++MODULE_DEVICE_TABLE(of, rt2880_wmac_match);
++
+ static struct platform_driver rt2800soc_driver = {
+ 	.driver		= {
+ 		.name		= "rt2800_wmac",
+ 		.mod_name	= KBUILD_MODNAME,
++		.of_match_table = rt2880_wmac_match,
+ 	},
+ 	.probe		= rt2800soc_probe,
+ 	.remove		= rt2x00soc_remove,
