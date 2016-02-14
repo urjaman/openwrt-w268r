@@ -133,6 +133,18 @@ endef
 
 $(eval $(call KernelPackage,crypto-iv))
 
+
+define KernelPackage/crypto-echainiv
+  TITLE:=Encrypted Chain IV Generator
+  KCONFIG:=CONFIG_CRYPTO_ECHAINIV
+  FILES:=$(LINUX_DIR)/crypto/echainiv.ko
+  AUTOLOAD:=$(call AutoLoad,09,echainiv)
+  $(call AddDepends/crypto)
+endef
+
+$(eval $(call KernelPackage,crypto-echainiv))
+
+
 define KernelPackage/crypto-seqiv
   TITLE:=CryptoAPI Sequence Number IV Generator
   DEPENDS:=+kmod-crypto-aead +kmod-crypto-rng
@@ -150,7 +162,9 @@ define KernelPackage/crypto-hw-talitos
   DEPENDS:=+kmod-crypto-manager +kmod-crypto-hash +kmod-random-core +kmod-crypto-authenc
   KCONFIG:= \
 	CONFIG_CRYPTO_HW=y \
-	CONFIG_CRYPTO_DEV_TALITOS
+	CONFIG_CRYPTO_DEV_TALITOS \
+	CONFIG_CRYPTO_DEV_TALITOS1=y \
+	CONFIG_CRYPTO_DEV_TALITOS2=y
   FILES:= \
 	$(LINUX_DIR)/drivers/crypto/talitos.ko
   AUTOLOAD:=$(call AutoLoad,09,talitos)
