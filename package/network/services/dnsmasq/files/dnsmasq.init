@@ -559,10 +559,6 @@ start_service() {
 	procd_set_param file $CONFIGFILE
 	procd_set_param respawn
 
-	procd_add_jail dnsmasq ubus log
-	procd_add_jail_mount $CONFIGFILE $TRUSTANCHORSFILE $HOSTFILE /etc/passwd /etc/group /etc/TZ /dev/null /dev/urandom /etc/dnsmasq.conf /tmp/dnsmasq.d /tmp/resolv.conf.auto /etc/hosts /etc/ethers
-	procd_add_jail_mount_rw /var/run/dnsmasq/ /tmp/dhcp.leases $TIMESTAMPFILE
-	
 	procd_close_instance
 
 	# before we can call xappend
@@ -573,7 +569,6 @@ start_service() {
 
 	if [ ! -f "$TIMESTAMPFILE" ]; then
 		touch "$TIMESTAMPFILE"
-		chown nobody.nogroup "$TIMESTAMPFILE"
 	fi
 
 	echo "# auto-generated config file from /etc/config/dhcp" > $CONFIGFILE
