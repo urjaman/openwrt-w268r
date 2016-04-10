@@ -24,6 +24,7 @@ PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
 PKG_DRIVERS = \
 	adm8211 \
+	airo \
 	ath ath5k ath9k ath9k-common ath9k-htc ath10k \
 	b43 b43legacy \
 	carl9170 \
@@ -31,7 +32,7 @@ PKG_DRIVERS = \
 	iwl-legacy iwl3945 iwl4965 iwlwifi \
 	lib80211 \
 	libipw ipw2100 ipw2200 \
-	libertas-sdio libertas-usb \
+	libertas-sdio libertas-usb libertas-spi \
 	mac80211-hwsim \
 	mt7601u \
 	mwl8k mwifiex-pcie \
@@ -136,6 +137,18 @@ define KernelPackage/adm8211
   DEPENDS+=@PCI_SUPPORT +kmod-mac80211 +kmod-eeprom-93cx6
   FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/admtek/adm8211.ko
   AUTOLOAD:=$(call AutoProbe,adm8211)
+endef
+
+define KernelPackage/airo
+  $(call KernelPackage/mac80211/Default)
+  TITLE:=Cisco Aironet driver
+  DEPENDS+=@PCI_SUPPORT +@DRIVER_WEXT_SUPPORT +kmod-cfg80211 @TARGET_x86
+  FILES:=$(PKG_BUILD_DIR)/drivers/net/wireless/cisco/airo.ko
+  AUTOLOAD:=$(call AutoProbe,airo)
+endef
+
+define KernelPackage/airo/description
+ Kernel support for Cisco Aironet cards
 endef
 
 define KernelPackage/ath/config
@@ -673,6 +686,7 @@ define KernelPackage/brcmfmac/config
 
 	config BRCMFMAC_SDIO
 		bool "Enable SDIO bus interface support"
+		default y if TARGET_brcm2708
 		default n
 		help
 		  Enable support for cards attached to an SDIO bus.
@@ -973,6 +987,20 @@ define KernelPackage/libertas-sdio
 	$(PKG_BUILD_DIR)/drivers/net/wireless/marvell/libertas/libertas.ko \
 	$(PKG_BUILD_DIR)/drivers/net/wireless/marvell/libertas/libertas_sdio.ko
   AUTOLOAD:=$(call AutoProbe,libertas libertas_sdio)
+endef
+
+define KernelPackage/libertas-spi
+  $(call KernelPackage/mac80211/Default)
+  SUBMENU:=Wireless Drivers
+  DEPENDS+= +kmod-cfg80211 +kmod-lib80211 +@DRIVER_WEXT_SUPPORT @!TARGET_uml +libertas-spi-firmware
+  KCONFIG := \
+	CONFIG_SPI=y \
+	CONFIG_SPI_MASTER=y
+  TITLE:=Marvell 88W8686 SPI Wireless Driver
+  FILES:= \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/marvell/libertas/libertas.ko \
+	$(PKG_BUILD_DIR)/drivers/net/wireless/marvell/libertas/libertas_spi.ko
+  AUTOLOAD:=$(call AutoProbe,libertas libertas_spi)
 endef
 
 define KernelPackage/mac80211-hwsim
@@ -1439,6 +1467,7 @@ config-y:= \
 	WLAN_VENDOR_ATH \
 	WLAN_VENDOR_ATMEL \
 	WLAN_VENDOR_BROADCOM \
+	WLAN_VENDOR_CISCO \
 	WLAN_VENDOR_INTEL \
 	WLAN_VENDOR_INTERSIL \
 	WLAN_VENDOR_MARVELL \
@@ -1476,6 +1505,8 @@ ifdef CONFIG_PACKAGE_MAC80211_TRACING
 endif
 
 config-$(call config_package,lib80211) += LIB80211 LIB80211_CRYPT_WEP LIB80211_CRYPT_CCMP LIB80211_CRYPT_TKIP
+
+config-$(call config_package,airo) += AIRO
 
 config-$(call config_package,ath) += ATH_CARDS ATH_COMMON
 config-$(CONFIG_PACKAGE_ATH_DEBUG) += ATH_DEBUG ATH10K_DEBUG
@@ -1573,6 +1604,7 @@ config-y += HERMES_PRISM
 config-$(call config_package,adm8211) += ADM8211
 config-$(call config_package,libertas-sdio) += LIBERTAS LIBERTAS_SDIO
 config-$(call config_package,libertas-usb) += LIBERTAS LIBERTAS_USB
+config-$(call config_package,libertas-spi) += LIBERTAS LIBERTAS_SPI
 config-$(call config_package,mwl8k) += MWL8K
 config-$(call config_package,mwifiex-pcie) += MWIFIEX MWIFIEX_PCIE
 config-$(call config_package,rtl8180) += RTL8180
@@ -1749,6 +1781,7 @@ endef
 
 
 $(eval $(call KernelPackage,adm8211))
+$(eval $(call KernelPackage,airo))
 $(eval $(call KernelPackage,ath))
 $(eval $(call KernelPackage,ath10k))
 $(eval $(call KernelPackage,ath5k))
@@ -1773,6 +1806,7 @@ $(eval $(call KernelPackage,iwl3945))
 $(eval $(call KernelPackage,lib80211))
 $(eval $(call KernelPackage,libertas-usb))
 $(eval $(call KernelPackage,libertas-sdio))
+$(eval $(call KernelPackage,libertas-spi))
 $(eval $(call KernelPackage,libipw))
 $(eval $(call KernelPackage,ipw2100))
 $(eval $(call KernelPackage,ipw2200))

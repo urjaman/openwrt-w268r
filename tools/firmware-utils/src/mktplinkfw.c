@@ -35,6 +35,7 @@
 #define HWID_ANTMINER_S3	0x04440301
 #define HWID_GL_INET_V1		0x08000001
 #define HWID_GS_OOLITE_V1	0x3C000101
+#define HWID_OMY_X1			0x06660201
 #define HWID_ONION_OMEGA	0x04700001
 #define HWID_TL_MR10U_V1	0x00100101
 #define HWID_TL_MR13U_V1	0x00130101
@@ -54,6 +55,7 @@
 #define HWID_TL_WA801ND_V3	0x08010003
 #define HWID_TL_WA901ND_V1	0x09010001
 #define HWID_TL_WA901ND_V2	0x09010002
+#define HWID_TL_WA901ND_V4	0x09010004
 #define HWID_TL_WDR4300_V1_IL	0x43008001
 #define HWID_TL_WDR4900_V1	0x49000001
 #define HWID_TL_WR703N_V1	0x07030101
@@ -315,6 +317,11 @@ static struct board_info boards[] = {
 		.hw_rev         = 1,
 		.layout_id	= "4M",
 	}, {
+		.id             = "TL-WA901NDv4",
+		.hw_id          = HWID_TL_WA901ND_V4,
+		.hw_rev         = 1,
+		.layout_id	= "4Mlzma",
+	}, {
 		.id             = "TL-WDR4300v1",
 		.hw_id          = HWID_TL_WDR4300_V1_IL,
 		.hw_rev         = 1,
@@ -429,6 +436,11 @@ static struct board_info boards[] = {
 		.hw_id		= HWID_GS_OOLITE_V1,
 		.hw_rev		= 1,
 		.layout_id	= "16Mlzma",
+	}, {
+		.id		= "OMY-X1",
+		.hw_id		= HWID_OMY_X1,
+		.hw_rev		= 1,
+		.layout_id	= "8Mlzma",
 	}, {
 		.id		= "ONION-OMEGA",
 		.hw_id		= HWID_ONION_OMEGA,

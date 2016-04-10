@@ -31,8 +31,8 @@ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 ifeq ($(PKG_VERSION),4.8.0)
   PKG_MD5SUM:=e6040024eb9e761c3bea348d1fa5abb0
 endif
-ifeq ($(PKG_VERSION),5.2.0)
-  PKG_MD5SUM:=a51bcfeb3da7dd4c623e27207ed43467
+ifeq ($(PKG_VERSION),5.3.0)
+  PKG_MD5SUM:=c9616fd448f980259c31de613e575719
 endif
 
 ifeq ($(findstring linaro, $(CONFIG_GCC_VERSION)),linaro)
@@ -133,6 +133,7 @@ GCC_CONFIGURE:= \
 		$(call qstrip,$(CONFIG_EXTRA_GCC_CONFIG_OPTIONS)) \
 		$(if $(CONFIG_mips64)$(CONFIG_mips64el),--with-arch=mips64 \
 			--with-abi=$(call qstrip,$(CONFIG_MIPS64_ABI))) \
+		$(if $(CONFIG_arc),--with-cpu=$(CONFIG_CPU_TYPE)) \
 		--with-gmp=$(TOPDIR)/staging_dir/host \
 		--with-mpfr=$(TOPDIR)/staging_dir/host \
 		--with-mpc=$(TOPDIR)/staging_dir/host \

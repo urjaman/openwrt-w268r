@@ -192,6 +192,11 @@ el-m150)
 		"0:lan" "1:lan" "3@eth1" # XXX: confirm!
 	;;
 
+tellstick-znet-lite)
+	ucidef_set_interface_wan "eth0" "dhcp"
+	ucidef_set_interface_raw "wlan" "wlan0" "dhcp"
+	;;
+
 tl-wdr4300|\
 tl-wr1041n-v2)
 	ucidef_add_switch "switch0" \
@@ -315,6 +320,7 @@ dlan-pro-1200-ac)
 	ucidef_add_switch_attr "switch0" "enable" "false"
 	;;
 
+alfa-ap120c |\
 all0305 |\
 antminer-s1 |\
 antminer-s3 |\
@@ -358,6 +364,7 @@ tl-wa801nd-v2 |\
 tl-wa901nd |\
 tl-wa901nd-v2 |\
 tl-wa901nd-v3 |\
+tl-wa901nd-v4 |\
 tl-wr703n |\
 tube2h |\
 unifiac |\
@@ -397,6 +404,11 @@ gl-ar300)
 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
 	ucidef_add_switch "switch0" \
 		"0@eth1" "1:lan" "2:lan" "3:lan" "4:lan"
+	;;
+
+wpj342)
+	ucidef_add_switch "switch0" \
+		"0@eth0" "1:lan" "2:wan"
 	;;
 
 wpj344)
