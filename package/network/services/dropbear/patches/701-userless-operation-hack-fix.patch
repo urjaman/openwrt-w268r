@@ -1,0 +1,38 @@
+From 54961a3e097a2315d32675d60d77477d5bf19574 Mon Sep 17 00:00:00 2001
+From: Urja Rannikko <urjaman@gmail.com>
+Date: Tue, 17 Oct 2017 20:09:27 +0300
+Subject: [PATCH 1/2] userless operation hack fix
+
+---
+ svr-authpubkey.c | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/svr-authpubkey.c b/svr-authpubkey.c
+index 607207f..8cd4036 100644
+--- a/svr-authpubkey.c
++++ b/svr-authpubkey.c
+@@ -235,21 +235,9 @@ static int checkpubkey(char* algo, unsigned int algolen,
+ 	}
+ 
+ 
+-	/* open the file as the authenticating user. */
+-	origuid = getuid();
+-	origgid = getgid();
+-	if ((setegid(ses.authstate.pw_gid)) < 0 ||
+-		(seteuid(ses.authstate.pw_uid)) < 0) {
+-		dropbear_exit("Failed to set euid");
+-	}
+ 
+ 	authfile = fopen(filename, "r");
+ 
+-	if ((seteuid(origuid)) < 0 ||
+-		(setegid(origgid)) < 0) {
+-		dropbear_exit("Failed to revert euid");
+-	}
+-
+ 	if (authfile == NULL) {
+ 		goto out;
+ 	}
+-- 
+2.14.2
+
