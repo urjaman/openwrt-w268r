@@ -421,6 +421,9 @@ ramips_board_detect() {
 	*"W150M")
 		name="w150m"
 		;;
+	*"W268R")
+		name="w268r"
+		;;
 	*"W306R V2.0")
 		name="w306r-v20"
 		;;

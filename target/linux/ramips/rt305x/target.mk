@@ -4,7 +4,7 @@
 
 SUBTARGET:=rt305x
 BOARDNAME:=RT3x5x/RT5350 based boards
-FEATURES+=usb ramdisk
+FEATURES+=ramdisk
 CPU_TYPE:=24kec
 CPU_SUBTYPE:=dsp
 

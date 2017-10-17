@@ -65,24 +65,13 @@ boot_run_hook() {
 }
 
 pivot() { # <new_root> <old_root>
-	/bin/mount -o noatime,move /proc $1/proc && \
-	pivot_root $1 $1$2 && {
-		/bin/mount -o noatime,move $2/dev /dev
-		/bin/mount -o noatime,move $2/tmp /tmp
-		/bin/mount -o noatime,move $2/sys /sys 2>&-
-		/bin/mount -o noatime,move $2/overlay /overlay 2>&-
-		return 0
-	}
+	true
 }
 
-fopivot() { # <rw_root> <work_dir> <ro_root> <dupe?>
-	/bin/mount -o noatime,lowerdir=/,upperdir=$1,workdir=$2 -t overlay "overlayfs:$1" /mnt
-	pivot /mnt $3
+fopivot() { # <rw_root> <ro_root> <dupe?>
+	true
 }
 
 ramoverlay() {
-	mkdir -p /tmp/root
-	/bin/mount -t tmpfs -o noatime,mode=0755 root /tmp/root
-	mkdir -p /tmp/root/root /tmp/root/work
-	fopivot /tmp/root/root /tmp/root/work /rom 1
+	true
 }

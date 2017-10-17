@@ -637,6 +637,12 @@ config BUSYBOX_CONFIG_LOCK
 	help
 	  Small utility for using locks in scripts
 
+config BUSYBOX_CONFIG_EVSTATE
+	bool "evstate"
+	default n
+	help
+	  Small utility for reading event keys in scripts
+
 config BUSYBOX_CONFIG_MAKEDEVS
 	bool "makedevs"
 	default BUSYBOX_DEFAULT_MAKEDEVS

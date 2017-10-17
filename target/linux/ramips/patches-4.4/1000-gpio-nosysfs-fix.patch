@@ -1,0 +1,17 @@
+--- a/drivers/gpio/gpiolib-of.c	2016-02-14 16:35:34.330000016 +0200
++++ b/drivers/gpio/gpiolib-of.c	2016-02-14 16:44:00.523333341 +0200
+@@ -453,6 +453,8 @@
+ 	of_node_put(chip->of_node);
+ }
+ 
++#ifdef CONFIG_GPIO_SYSFS
++
+ static struct of_device_id gpio_export_ids[] = {
+ 	{ .compatible = "gpio-export" },
+ 	{ /* sentinel */ }
+@@ -518,3 +520,5 @@
+ 	return platform_driver_probe(&gpio_export_driver, of_gpio_export_probe);
+ }
+ device_initcall(of_gpio_export_init);
++
++#endif

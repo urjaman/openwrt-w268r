@@ -1,0 +1,289 @@
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 81254f6..28494d2 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -39,18 +39,10 @@ int main (int argc, char **argv)
+   struct sigaction sigact;
+   struct iname *if_tmp;
+   int piperead, pipefd[2], err_pipe[2];
+-  struct passwd *ent_pw = NULL;
+-#if defined(HAVE_SCRIPT)
+-  uid_t script_uid = 0;
+-  gid_t script_gid = 0;
+-#endif
+-  struct group *gp = NULL;
++
+   long i, max_fd = sysconf(_SC_OPEN_MAX);
+-  char *baduser = NULL;
+   int log_err;
+ #if defined(HAVE_LINUX_NETWORK)
+-  cap_user_header_t hdr = NULL;
+-  cap_user_data_t data = NULL;
+   char *bound_device = NULL;
+   int did_bind = 0;
+ #endif 
+@@ -360,66 +352,6 @@ int main (int argc, char **argv)
+   if (daemon->port != 0)
+     pre_allocate_sfds();
+ 
+-#if defined(HAVE_SCRIPT)
+-  /* Note getpwnam returns static storage */
+-  if ((daemon->dhcp || daemon->dhcp6) && 
+-      daemon->scriptuser && 
+-      (daemon->lease_change_command || daemon->luascript))
+-    {
+-      if ((ent_pw = getpwnam(daemon->scriptuser)))
+-	{
+-	  script_uid = ent_pw->pw_uid;
+-	  script_gid = ent_pw->pw_gid;
+-	 }
+-      else
+-	baduser = daemon->scriptuser;
+-    }
+-#endif
+-  
+-  if (daemon->username && !(ent_pw = getpwnam(daemon->username)))
+-    baduser = daemon->username;
+-  else if (daemon->groupname && !(gp = getgrnam(daemon->groupname)))
+-    baduser = daemon->groupname;
+-
+-  if (baduser)
+-    die(_("unknown user or group: %s"), baduser, EC_BADCONF);
+-
+-  /* implement group defaults, "dip" if available, or group associated with uid */
+-  if (!daemon->group_set && !gp)
+-    {
+-      if (!(gp = getgrnam(CHGRP)) && ent_pw)
+-	gp = getgrgid(ent_pw->pw_gid);
+-      
+-      /* for error message */
+-      if (gp)
+-	daemon->groupname = gp->gr_name; 
+-    }
+-
+-#if defined(HAVE_LINUX_NETWORK)
+-  /* determine capability API version here, while we can still
+-     call safe_malloc */
+-  if (ent_pw && ent_pw->pw_uid != 0)
+-    {
+-      int capsize = 1; /* for header version 1 */
+-      hdr = safe_malloc(sizeof(*hdr));
+-
+-      /* find version supported by kernel */
+-      memset(hdr, 0, sizeof(*hdr));
+-      capget(hdr, NULL);
+-      
+-      if (hdr->version != LINUX_CAPABILITY_VERSION_1)
+-	{
+-	  /* if unknown version, use largest supported version (3) */
+-	  if (hdr->version != LINUX_CAPABILITY_VERSION_2)
+-	    hdr->version = LINUX_CAPABILITY_VERSION_3;
+-	  capsize = 2;
+-	}
+-      
+-      data = safe_malloc(sizeof(*data) * capsize);
+-      memset(data, 0, sizeof(*data) * capsize);
+-    }
+-#endif
+-
+   /* Use a pipe to carry signals and other events back to the event loop 
+      in a race-free manner and another to carry errors to daemon-invoking process */
+   safe_pipe(pipefd, 1);
+@@ -511,9 +443,7 @@ int main (int argc, char **argv)
+ 	  
+ 	  if ((fd = open(daemon->runfile, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL, S_IWUSR|S_IRUSR|S_IRGRP|S_IROTH)) == -1)
+ 	    {
+-	      /* only complain if started as root */
+-	      if (getuid() == 0)
+-		err = 1;
++	    	err = 1;
+ 	    }
+ 	  else
+ 	    {
+@@ -535,7 +465,7 @@ int main (int argc, char **argv)
+ 	}
+     }
+   
+-   log_err = log_start(ent_pw, err_pipe[1]);
++   log_err = log_start(NULL, err_pipe[1]);
+ 
+    if (!option_bool(OPT_DEBUG)) 
+      {       
+@@ -551,100 +481,11 @@ int main (int argc, char **argv)
+   daemon->helperfd = -1;
+ #ifdef HAVE_SCRIPT 
+   if ((daemon->dhcp || daemon->dhcp6) && (daemon->lease_change_command || daemon->luascript))
+-    daemon->helperfd = create_helper(pipewrite, err_pipe[1], script_uid, script_gid, max_fd);
++    daemon->helperfd = create_helper(pipewrite, err_pipe[1], 0, 0, max_fd);
+ #endif
+ 
+-  if (!option_bool(OPT_DEBUG) && getuid() == 0)   
+-    {
+-      int bad_capabilities = 0;
+-      gid_t dummy;
+-      
+-      /* remove all supplimentary groups */
+-      if (gp && 
+-	  (setgroups(0, &dummy) == -1 ||
+-	   setgid(gp->gr_gid) == -1))
+-	{
+-	  send_event(err_pipe[1], EVENT_GROUP_ERR, errno, daemon->groupname);
+-	  _exit(0);
+-	}
+-  
+-      if (ent_pw && ent_pw->pw_uid != 0)
+-	{     
+-#if defined(HAVE_LINUX_NETWORK)	  
+-	  /* On linux, we keep CAP_NETADMIN (for ARP-injection) and
+-	     CAP_NET_RAW (for icmp) if we're doing dhcp. If we have yet to bind 
+-	     ports because of DAD, or we're doing it dynamically,
+-	     we need CAP_NET_BIND_SERVICE too. */
+-	  if (is_dad_listeners() || option_bool(OPT_CLEVERBIND))
+-	    data->effective = data->permitted = data->inheritable =
+-	      (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW) | 
+-	      (1 << CAP_SETUID) | (1 << CAP_NET_BIND_SERVICE);
+-	  else
+-	    data->effective = data->permitted = data->inheritable =
+-	      (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW) | (1 << CAP_SETUID);
+-	  
+-	  /* Tell kernel to not clear capabilities when dropping root */
+-	  if (capset(hdr, data) == -1 || prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0) == -1)
+-	    bad_capabilities = errno;
+-			  
+-#elif defined(HAVE_SOLARIS_NETWORK)
+-	  /* http://developers.sun.com/solaris/articles/program_privileges.html */
+-	  priv_set_t *priv_set;
+-	  
+-	  if (!(priv_set = priv_str_to_set("basic", ",", NULL)) ||
+-	      priv_addset(priv_set, PRIV_NET_ICMPACCESS) == -1 ||
+-	      priv_addset(priv_set, PRIV_SYS_NET_CONFIG) == -1)
+-	    bad_capabilities = errno;
+ 
+-	  if (priv_set && bad_capabilities == 0)
+-	    {
+-	      priv_inverse(priv_set);
+-	  
+-	      if (setppriv(PRIV_OFF, PRIV_LIMIT, priv_set) == -1)
+-		bad_capabilities = errno;
+-	    }
+-
+-	  if (priv_set)
+-	    priv_freeset(priv_set);
+-
+-#endif    
+-
+-	  if (bad_capabilities != 0)
+-	    {
+-	      send_event(err_pipe[1], EVENT_CAP_ERR, bad_capabilities, NULL);
+-	      _exit(0);
+-	    }
+-	  
+-	  /* finally drop root */
+-	  if (setuid(ent_pw->pw_uid) == -1)
+-	    {
+-	      send_event(err_pipe[1], EVENT_USER_ERR, errno, daemon->username);
+-	      _exit(0);
+-	    }     
+-
+-#ifdef HAVE_LINUX_NETWORK
+-	  if (is_dad_listeners() || option_bool(OPT_CLEVERBIND))
+-	   data->effective = data->permitted =
+-	     (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW) | (1 << CAP_NET_BIND_SERVICE);
+-	 else
+-	   data->effective = data->permitted = 
+-	     (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
+-	  data->inheritable = 0;
+-	  
+-	  /* lose the setuid and setgid capbilities */
+-	  if (capset(hdr, data) == -1)
+-	    {
+-	      send_event(err_pipe[1], EVENT_CAP_ERR, errno, NULL);
+-	      _exit(0);
+-	    }
+-#endif
+-	  
+-	}
+-    }
+-  
+ #ifdef HAVE_LINUX_NETWORK
+-  free(hdr);
+-  free(data);
+   if (option_bool(OPT_DEBUG)) 
+     prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
+ #endif
+diff --git a/src/helper.c b/src/helper.c
+index 1fee72d..af194a8 100644
+--- a/src/helper.c
++++ b/src/helper.c
+@@ -105,27 +105,6 @@ int create_helper(int event_fd, int err_fd, uid_t uid, gid_t gid, long max_fd)
+   sigaction(SIGTERM, &sigact, NULL);
+   sigaction(SIGALRM, &sigact, NULL);
+ 
+-  if (!option_bool(OPT_DEBUG) && uid != 0)
+-    {
+-      gid_t dummy;
+-      if (setgroups(0, &dummy) == -1 || 
+-	  setgid(gid) == -1 || 
+-	  setuid(uid) == -1)
+-	{
+-	  if (option_bool(OPT_NO_FORK))
+-	    /* send error to daemon process if no-fork */
+-	    send_event(event_fd, EVENT_USER_ERR, errno, daemon->scriptuser);
+-	  else
+-	    {
+-	      /* kill daemon */
+-	      send_event(event_fd, EVENT_DIE, 0, NULL);
+-	      /* return error */
+-	      send_event(err_fd, EVENT_USER_ERR, errno, daemon->scriptuser);
+-	    }
+-	  _exit(0);
+-	}
+-    }
+-
+   /* close all the sockets etc, we don't need them here. 
+      Don't close err_fd, in case the lua-init fails.
+      Note that we have to do this before lua init
+diff --git a/src/log.c b/src/log.c
+index 27b2e59..1d32636 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -97,12 +97,6 @@ int log_start(struct passwd *ent_pw, int errfd)
+       entries_alloced = 1;
+     }
+ 
+-  /* If we're running as root and going to change uid later,
+-     change the ownership here so that the file is always owned by
+-     the dnsmasq user. Then logrotate can just copy the owner.
+-     Failure of the chown call is OK, (for instance when started as non-root) */
+-  if (log_to_file && !log_stderr && ent_pw && ent_pw->pw_uid != 0 && 
+-      fchown(log_fd, ent_pw->pw_uid, -1) != 0)
+     ret = errno;
+ 
+   return ret;
+diff --git a/src/tftp.c b/src/tftp.c
+index 350a587..2b4e1e4 100644
+--- a/src/tftp.c
++++ b/src/tftp.c
+@@ -424,7 +424,6 @@ static struct tftp_file *check_tftp_fileperm(ssize_t *len, char *prefix)
+   char *packet = daemon->packet, *namebuff = daemon->namebuff;
+   struct tftp_file *file;
+   struct tftp_transfer *t;
+-  uid_t uid = geteuid();
+   struct stat statbuf;
+   int fd = -1;
+ 
+@@ -450,14 +449,8 @@ static struct tftp_file *check_tftp_fileperm(ssize_t *len, char *prefix)
+     goto oops;
+   
+   /* running as root, must be world-readable */
+-  if (uid == 0)
+-    {
+       if (!(statbuf.st_mode & S_IROTH))
+ 	goto perm;
+-    }
+-  /* in secure mode, must be owned by user running dnsmasq */
+-  else if (option_bool(OPT_TFTP_SECURE) && uid != statbuf.st_uid)
+-    goto perm;
+       
+   /* If we're doing many tranfers from the same file, only 
+      open it once this saves lots of file descriptors 

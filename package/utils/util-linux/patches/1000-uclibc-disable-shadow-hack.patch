@@ -1,0 +1,89 @@
+diff --git a/login-utils/lslogins.c b/login-utils/lslogins.c
+index 4503fe5..ab5043f 100644
+--- a/login-utils/lslogins.c
++++ b/login-utils/lslogins.c
+@@ -28,7 +28,7 @@
+ #include <sys/syslog.h>
+ #include <pwd.h>
+ #include <grp.h>
+-#include <shadow.h>
++//#include <shadow.h>
+ #include <paths.h>
+ #include <time.h>
+ #include <utmp.h>
+@@ -551,7 +551,6 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+ 	struct lslogins_user *user;
+ 	struct passwd *pwd;
+ 	struct group *grp;
+-	struct spwd *shadow;
+ 	struct utmp *user_wtmp = NULL, *user_btmp = NULL;
+ 	int n = 0;
+ 	time_t time;
+@@ -591,9 +590,6 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+ 	if (ctl->btmp)
+ 		user_btmp = get_last_btmp(ctl, pwd->pw_name);
+ 
+-	lckpwdf();
+-	shadow = getspnam(pwd->pw_name);
+-	ulckpwdf();
+ 
+ 	/* required  by tseach() stuff */
+ 	user->uid = pwd->pw_uid;
+@@ -656,27 +652,13 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+ 				user->hushed = STATUS_UNKNOWN;
+ 			break;
+ 		case COL_PWDEMPTY:
+-			if (shadow) {
+-				if (!*shadow->sp_pwdp) /* '\0' */
+-					user->pwd_empty = STATUS_TRUE;
+-			} else
+ 				user->pwd_empty = STATUS_UNKNOWN;
+ 			break;
+ 		case COL_PWDDENY:
+-			if (shadow) {
+-				if ((*shadow->sp_pwdp == '!' ||
+-				     *shadow->sp_pwdp == '*') &&
+-				    !valid_pwd(shadow->sp_pwdp + 1))
+-					user->pwd_deny = STATUS_TRUE;
+-			} else
+ 				user->pwd_deny = STATUS_UNKNOWN;
+ 			break;
+ 
+ 		case COL_PWDLOCK:
+-			if (shadow) {
+-				if (*shadow->sp_pwdp == '!' && valid_pwd(shadow->sp_pwdp + 1))
+-					user->pwd_lock = STATUS_TRUE;
+-			} else
+ 				user->pwd_lock = STATUS_UNKNOWN;
+ 			break;
+ 		case COL_NOLOGIN:
+@@ -687,29 +669,17 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+ 						access("/var/run/nologin", F_OK) == 0;
+ 			break;
+ 		case COL_PWD_WARN:
+-			if (shadow && shadow->sp_warn >= 0)
+-				xasprintf(&user->pwd_warn, "%ld", shadow->sp_warn);
+ 			break;
+ 		case COL_PWD_EXPIR:
+-			if (shadow && shadow->sp_expire >= 0)
+-				user->pwd_expire = make_time(TIME_SHORT,
+-						shadow->sp_expire * 86400);
+ 			break;
+ 		case COL_PWD_CTIME:
+ 			/* sp_lstchg is specified in days, showing hours
+ 			 * (especially in non-GMT timezones) would only serve
+ 			 * to confuse */
+-			if (shadow)
+-				user->pwd_ctime = make_time(TIME_SHORT,
+-						shadow->sp_lstchg * 86400);
+ 			break;
+ 		case COL_PWD_CTIME_MIN:
+-			if (shadow && shadow->sp_min > 0)
+-				xasprintf(&user->pwd_ctime_min, "%ld", shadow->sp_min);
+ 			break;
+ 		case COL_PWD_CTIME_MAX:
+-			if (shadow && shadow->sp_max > 0)
+-				xasprintf(&user->pwd_ctime_max, "%ld", shadow->sp_max);
+ 			break;
+ 		case COL_SELINUX:
+ #ifdef HAVE_LIBSELINUX

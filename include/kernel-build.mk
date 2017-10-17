@@ -76,13 +76,14 @@ define BuildKernel
 	rm -f $(KERNEL_BUILD_DIR)/symtab.h
 	touch $(KERNEL_BUILD_DIR)/symtab.h
 	+$(MAKE) $(KERNEL_MAKEOPTS) vmlinux
+	touch $(KERNEL_BUILD_DIR)/mod_symtab.txt
 	find $(LINUX_DIR) $(STAGING_DIR_ROOT)/lib/modules -name \*.ko | \
 		xargs $(TARGET_CROSS)nm | \
 		awk '$$$$1 == "U" { print $$$$2 } ' | \
-		sort -u > $(KERNEL_BUILD_DIR)/mod_symtab.txt
-	$(TARGET_CROSS)nm -n $(LINUX_DIR)/vmlinux.o | grep ' [rR] __ksymtab' | sed -e 's,........ [rR] __ksymtab_,,' > $(KERNEL_BUILD_DIR)/kernel_symtab.txt
-	grep -Ff $(KERNEL_BUILD_DIR)/mod_symtab.txt $(KERNEL_BUILD_DIR)/kernel_symtab.txt > $(KERNEL_BUILD_DIR)/sym_include.txt
-	grep -Fvf $(KERNEL_BUILD_DIR)/mod_symtab.txt $(KERNEL_BUILD_DIR)/kernel_symtab.txt > $(KERNEL_BUILD_DIR)/sym_exclude.txt
+		sort -u > $(KERNEL_BUILD_DIR)/mod_symtab.txt || echo Whatever
+	-$(TARGET_CROSS)nm -n $(LINUX_DIR)/vmlinux.o | grep ' [rR] __ksymtab' | sed -e 's,........ [rR] __ksymtab_,,' > $(KERNEL_BUILD_DIR)/kernel_symtab.txt
+	-grep -Ff $(KERNEL_BUILD_DIR)/mod_symtab.txt $(KERNEL_BUILD_DIR)/kernel_symtab.txt > $(KERNEL_BUILD_DIR)/sym_include.txt
+	-grep -Fvf $(KERNEL_BUILD_DIR)/mod_symtab.txt $(KERNEL_BUILD_DIR)/kernel_symtab.txt > $(KERNEL_BUILD_DIR)/sym_exclude.txt
 	( \
 		echo '#define SYMTAB_KEEP \'; \
 		cat $(KERNEL_BUILD_DIR)/sym_include.txt | \
@@ -107,7 +108,7 @@ define BuildKernel
 	touch $$@
 
   $(LINUX_DIR)/.modules: $(STAMP_CONFIGURED) $(LINUX_DIR)/.config FORCE
-	$(Kernel/CompileModules)
+	-$(Kernel/CompileModules)
 	touch $$@
 
   $(LINUX_DIR)/.image: $(STAMP_CONFIGURED) $(if $(CONFIG_STRIP_KERNEL_EXPORTS),$(KERNEL_BUILD_DIR)/symtab.h) FORCE

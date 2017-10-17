@@ -118,6 +118,7 @@ esr-9753|\
 hlk-rm04|\
 sl-r7205|\
 v11st-fe|\
+w268r|\
 w306r-v20|\
 wt1520)
 	set_wifi_led "rt2800pci-phy0::radio"

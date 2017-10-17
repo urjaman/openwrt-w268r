@@ -1,3 +1,38 @@
+Tenda W268R-related notes:
+The system is very minimalized and doesnt follow normal
+openwrt telnet + ssh system (with passwords),
+so there's a few files (secrets) missing from the repo for a
+functional image (atleast the host key and authorized keys):
+
+package/base-files/files/etc/dropbear/authorized_keys
+package/network/services/dropbear/files/dropbear_rsa_host_key
+package/base-files/files/root/.ssh/id_dropbear
+package/base-files/files/etc/config/wireless
+
+also see
+package/base-files/files/etc/config/network
+
+It has a script to save files specified in 
+/etc/cfg-saved-files (doesnt exist in image) to a 64k
+mtd partition as cpio.gz for storing config
+and a script thats run early on boot to restore them
+(including the list of saved files that contains ref to itself).
+If the WPS button is held during boot the restore is
+skipped and the device has "factory" behaviour -
+this is the only failsafe i have.
+
+Updating FW is performed via script that uses scp 
+to get the file from my pc and 
+flashcp -v file /dev/mtd3 (IIRC, check yourself please)
+
+Note on the role of the W268R for me (and the package selection):
+- before the commit that added this message it was a WLAN AP/bridge-from-lan with minimal ebtables-based
+ (manual script) filtering abilities for a guest wlan ap.
+- after this commit it's a relayd pseudobridge (bridge wlan->lan), with manually configured udhcpd serving
+the lan because relayd dhcp bridging seems not to work (unknown why).
+
+end of W268R notes
+
 This is the buildsystem for the OpenWrt Linux distribution.
 
 Please use "make menuconfig" to configure your appreciated

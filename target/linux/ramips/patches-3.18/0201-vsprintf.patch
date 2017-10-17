@@ -1,0 +1,16 @@
+--- a/lib/vsprintf.c	2015-08-31 12:04:26.811735322 +0300
++++ b/lib/vsprintf.c	2015-09-01 03:25:04.548880330 +0300
+@@ -634,11 +634,13 @@
+ #else
+ 	len = snprintf(sym, sizeof(sym), "0x%lx", value);
+ 
++#ifdef CONFIG_MODULES
+ 	mod = __module_address(value);
+ 	if (mod)
+ 		snprintf(sym + len, sizeof(sym) - len, " [%s@%p+0x%x]",
+ 			 mod->name, mod->module_core, mod->core_size);
+ #endif
++#endif
+ 	return string(buf, end, sym, spec);
+ }
+ 

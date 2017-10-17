@@ -1,0 +1,15 @@
+#!/bin/sh
+cp /etc/cfg-saved-files /tmp/saved-files
+echo "/tmp/random" >> /tmp/saved-files
+dd if=/dev/urandom of=/tmp/random bs=512 count=1 >/dev/null 2>&1
+cpio -oH newc < /tmp/saved-files | gzip -9 > /tmp/save.cpio.gz
+rm /tmp/random
+SIZEK=$(du -k /tmp/save.cpio.gz | cut -f1)
+echo "Save uses $SIZEK K on disk"
+if [ $SIZEK -gt 64 ]; then
+	echo "Too Big. Aborting save."
+	exit 1
+fi
+flashcp -v /tmp/save.cpio.gz /dev/mtd4
+rm /tmp/save.cpio.gz
+rm /tmp/saved-files

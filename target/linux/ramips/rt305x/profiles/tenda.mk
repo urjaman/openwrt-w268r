@@ -40,3 +40,13 @@ define Profile/W306R_V20/Description
 	Package set for Tenda W306R V2.0 board
 endef
 $(eval $(call Profile,W306R_V20))
+
+define Profile/W268R
+	NAME:=Tenda W268R
+	PACKAGES:=
+endef
+
+define Profile/W268R/Description
+	Package set for Tenda W268R board
+endef
+$(eval $(call Profile,W268R))

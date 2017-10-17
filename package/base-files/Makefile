@@ -32,8 +32,8 @@ endif
 define Package/base-files
   SECTION:=base
   CATEGORY:=Base system
-  DEPENDS:=+netifd +libc +procd +jsonfilter +SIGNED_PACKAGES:usign +fstools
-  TITLE:=Base filesystem for OpenWrt
+  DEPENDS:= +libc +SIGNED_PACKAGES:usign
+  TITLE:=Base filesystem for OpenWrt (simplified)
   URL:=http://openwrt.org/
   VERSION:=$(PKG_RELEASE)-$(REVISION)
 endef
@@ -52,10 +52,8 @@ define Package/base-files/conffiles
 /etc/shells
 /etc/sysctl.conf
 /etc/rc.local
-/etc/sysupgrade.conf
 /etc/config/
 /etc/dropbear/
-/etc/crontabs/
 /etc/sysctl.d/local.conf
 /etc/sysctl.d/
 /etc/iproute2/rt_tables
@@ -150,19 +148,14 @@ define Package/base-files/install
 
 	mkdir -p $(1)/CONTROL
 	mkdir -p $(1)/dev
-	mkdir -p $(1)/etc/crontabs
 	mkdir -p $(1)/etc/rc.d
-	mkdir -p $(1)/overlay
 	mkdir -p $(1)/lib/firmware
 	$(if $(LIB_SUFFIX),-$(LN) lib $(1)/lib$(LIB_SUFFIX))
 	mkdir -p $(1)/mnt
 	mkdir -p $(1)/proc
 	mkdir -p $(1)/tmp
-	mkdir -p $(1)/usr/lib
 	$(if $(LIB_SUFFIX),-$(LN) lib $(1)/usr/lib$(LIB_SUFFIX))
-	mkdir -p $(1)/usr/bin
 	mkdir -p $(1)/sys
-	mkdir -p $(1)/www
 	mkdir -p $(1)/root
 	$(LN) /proc/mounts $(1)/etc/mtab
 	rm -f $(1)/var

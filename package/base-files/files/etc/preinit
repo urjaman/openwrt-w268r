@@ -18,8 +18,8 @@ fs_failsafe_netmask=255.255.255.0
 
 fs_failsafe_wait_timeout=2
 
-pi_suppress_stderr="y"
-pi_init_suppress_stderr="y"
+pi_suppress_stderr="n"
+pi_init_suppress_stderr="n"
 pi_init_path="%PATH%"
 pi_init_cmd="/sbin/init"
 

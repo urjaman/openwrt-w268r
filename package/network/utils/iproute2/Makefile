@@ -42,7 +42,7 @@ Package/ip-full=$(call Package/iproute2/Default,full,Full)
 define Package/tc
 $(call Package/iproute2/Default)
   TITLE:=Traffic control utility
-  DEPENDS:=+kmod-sched-core
+  DEPENDS:=
 endef
 
 define Package/genl

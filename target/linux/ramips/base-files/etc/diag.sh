@@ -182,6 +182,7 @@ get_status_led() {
 	v22rw-2x2)
 		status_led="$board:green:security"
 		;;
+	w268r|\
 	w306r-v20|\
 	witi|\
 	zbt-wr8305rt)

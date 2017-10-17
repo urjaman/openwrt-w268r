@@ -115,7 +115,7 @@ endef
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
-		PROGRAMS="dropbear dbclient dropbearkey scp" \
+		PROGRAMS="dropbear dbclient scp" \
 		MULTI=1 SCPPROGRESS=1
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
@@ -129,14 +129,14 @@ define Package/dropbear/install
 	$(LN) ../sbin/dropbear $(1)/usr/bin/scp
 	$(LN) ../sbin/dropbear $(1)/usr/bin/ssh
 	$(LN) ../sbin/dropbear $(1)/usr/bin/dbclient
-	$(LN) ../sbin/dropbear $(1)/usr/bin/dropbearkey
+#	$(LN) ../sbin/dropbear $(1)/usr/bin/dropbearkey
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./files/dropbear.config $(1)/etc/config/dropbear
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/dropbear.init $(1)/etc/init.d/dropbear
 	$(INSTALL_DIR) $(1)/usr/lib/opkg/info
 	$(INSTALL_DIR) $(1)/etc/dropbear
-	touch $(1)/etc/dropbear/dropbear_rsa_host_key
+	$(INSTALL_DATA) ./files/dropbear_rsa_host_key $(1)/etc/dropbear/dropbear_rsa_host_key
 endef
 
 define Package/dropbearconvert/install
