@@ -26,10 +26,30 @@ to get the file from my pc and
 flashcp -v file /dev/mtd3 (IIRC, check yourself please)
 
 Note on the role of the W268R for me (and the package selection):
-- before the commit that added this message it was a WLAN AP/bridge-from-lan with minimal ebtables-based
- (manual script) filtering abilities for a guest wlan ap.
-- after this commit it's a relayd pseudobridge (bridge wlan->lan), with manually configured udhcpd serving
+- it's a relayd pseudobridge (bridge wlan->lan), with manually configured udhcpd serving
 the lan because relayd dhcp bridging seems not to work (unknown why).
+(way back it used to be an AP, but not now)
+
+Note from 2017: Updated after that WPA2 breakage thing, might
+be the last time i touch the W268R.
+I was hoping for Designated Driver to be released and
+get an official stable branch and i was thinking
+of following that with the W268R patchset*, but then
+LEDE and confusion happened... and I'm thinking of
+moving away from the W268R as my wlan-lan-bridge
+soon anyways. It might get more service in other
+places though, so who knows.
+
+* yeah I was super lazy when migrating to the
+github openwrt tree (from openwrt.org git) and
+just squished it into a single patch, so now
+it's less of a patchset and more an awkward blobby thing,
+it would require a lot of work to make it even look
+like something (partially) upstreamable, so I'll
+let it be what it is, and that is a stable and
+relatively safe firmware for the W268R if you're
+into putting a serial adapter inside it and
+are happy twiddling with linux things
 
 end of W268R notes
 
