@@ -1,7 +1,6 @@
-diff --git a/login-utils/lslogins.c b/login-utils/lslogins.c
-index 4503fe5..ab5043f 100644
---- a/login-utils/lslogins.c
-+++ b/login-utils/lslogins.c
+diff -ur util-linux-2.28.old/login-utils/lslogins.c util-linux-2.28/login-utils/lslogins.c
+--- util-linux-2.28.old/login-utils/lslogins.c	2016-03-07 16:30:07.445866615 +0200
++++ util-linux-2.28/login-utils/lslogins.c	2017-10-17 18:08:19.642260397 +0300
 @@ -28,7 +28,7 @@
  #include <sys/syslog.h>
  #include <pwd.h>
@@ -11,7 +10,7 @@ index 4503fe5..ab5043f 100644
  #include <paths.h>
  #include <time.h>
  #include <utmp.h>
-@@ -551,7 +551,6 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+@@ -589,7 +589,6 @@
  	struct lslogins_user *user;
  	struct passwd *pwd;
  	struct group *grp;
@@ -19,7 +18,7 @@ index 4503fe5..ab5043f 100644
  	struct utmp *user_wtmp = NULL, *user_btmp = NULL;
  	int n = 0;
  	time_t time;
-@@ -591,9 +590,6 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+@@ -629,9 +628,6 @@
  	if (ctl->btmp)
  		user_btmp = get_last_btmp(ctl, pwd->pw_name);
  
@@ -29,7 +28,7 @@ index 4503fe5..ab5043f 100644
  
  	/* required  by tseach() stuff */
  	user->uid = pwd->pw_uid;
-@@ -656,27 +652,13 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
+@@ -694,27 +690,13 @@
  				user->hushed = STATUS_UNKNOWN;
  			break;
  		case COL_PWDEMPTY:
@@ -57,8 +56,8 @@ index 4503fe5..ab5043f 100644
  				user->pwd_lock = STATUS_UNKNOWN;
  			break;
  		case COL_NOLOGIN:
-@@ -687,29 +669,17 @@ static struct lslogins_user *get_user_info(struct lslogins_control *ctl, const c
- 						access("/var/run/nologin", F_OK) == 0;
+@@ -725,31 +707,14 @@
+ 						access(_PATH_VAR_NOLOGIN, F_OK) == 0;
  			break;
  		case COL_PWD_WARN:
 -			if (shadow && shadow->sp_warn >= 0)
@@ -66,15 +65,17 @@ index 4503fe5..ab5043f 100644
  			break;
  		case COL_PWD_EXPIR:
 -			if (shadow && shadow->sp_expire >= 0)
--				user->pwd_expire = make_time(TIME_SHORT,
+-				user->pwd_expire = make_time(ctl->time_mode == TIME_ISO ?
+-						TIME_ISO_SHORT : ctl->time_mode,
 -						shadow->sp_expire * 86400);
  			break;
  		case COL_PWD_CTIME:
- 			/* sp_lstchg is specified in days, showing hours
- 			 * (especially in non-GMT timezones) would only serve
- 			 * to confuse */
+-			/* sp_lstchg is specified in days, showing hours
+-			 * (especially in non-GMT timezones) would only serve
+-			 * to confuse */
 -			if (shadow)
--				user->pwd_ctime = make_time(TIME_SHORT,
+-				user->pwd_ctime = make_time(ctl->time_mode == TIME_ISO ?
+-						TIME_ISO_SHORT : ctl->time_mode,
 -						shadow->sp_lstchg * 86400);
  			break;
  		case COL_PWD_CTIME_MIN:
