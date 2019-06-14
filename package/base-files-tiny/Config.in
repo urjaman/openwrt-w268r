@@ -1,0 +1,13 @@
+menu "Configuration"
+	depends on PACKAGE_base-files-tiny
+
+config BASE_FILES_TINY_NO_CONFIG_GEN
+	bool "Remove config generation support (/bin/config_generate)"
+	default n
+	help
+		This is useful on the first boot if you want _a_ network&system configuration,
+		but bloat after that so if you saved your config already, or are providing one
+		you can remove this.
+
+endmenu
+
