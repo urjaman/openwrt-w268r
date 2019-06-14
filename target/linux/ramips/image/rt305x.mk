@@ -744,6 +744,14 @@ define Device/w150m
 endef
 TARGET_DEVICES += w150m
 
+define Device/w268r
+  DTS := W268R
+  IMAGE_SIZE := $(ralink_default_fw_size_4M)
+  UIMAGE_NAME:= linkn Kernel Image
+  DEVICE_TITLE := Tenda W268R
+endef
+TARGET_DEVICES += w268r
+
 define Device/w306r-v20
   DTS := W306R_V20
   IMAGE_SIZE := $(ralink_default_fw_size_4M)
