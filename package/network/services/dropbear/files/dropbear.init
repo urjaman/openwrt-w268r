@@ -12,91 +12,6 @@ PIDCOUNT=0
 EXTRA_COMMANDS="killclients"
 EXTRA_HELP="	killclients Kill ${NAME} processes except servers and yourself"
 
-_dropbearkey()
-{
-	/usr/bin/dropbearkey "$@" 0<&- 1>&- 2>&-
-}
-
-# $1 - host key file name
-hk_verify()
-{
-	[ -f "$1" ] || return 1
-	[ -s "$1" ] || return 2
-	_dropbearkey -y -f "$1" || return 3
-	return 0
-}
-
-# $1 - hk_verify() return code
-hk_errmsg()
-{
-	case "$1" in
-	0) ;;
-	1) echo "file does not exist" ;;
-	2) echo "file has zero length" ;;
-	3) echo "file is not valid host key or not supported" ;;
-	*) echo "unknown error" ;;
-	esac
-}
-
-# $1 - config option
-# $2 - host key file name
-hk_config()
-{
-	local x m
-	hk_verify "$2"; x=$?
-	case "$x" in
-	0)	procd_append_param command -r "$2"
-		;;
-	*)	m=$(hk_errmsg "$x")
-		logger -t "${NAME}" -p daemon.warn \
-		  "option '$1', value '$2': $m, skipping"
-		;;
-	esac
-}
-
-# $1 - host key file name
-hk_config__keyfile()
-{
-	hk_config 'keyfile' "$1"
-}
-
-hk_generate_as_needed()
-{
-	local kdir kgen ktype tdir kcount tfile
-	kdir='/etc/dropbear'
-
-	kgen=''
-	for ktype in ecdsa rsa; do
-		hk_verify "${kdir}/dropbear_${ktype}_host_key" && continue
-
-		kgen="${kgen} ${ktype}"
-	done
-
-	[ -z "${kgen}" ] && return
-
-	tdir=$(mktemp -d); chmod 0700 "${tdir}"
-
-	kcount=0
-	for ktype in ${kgen}; do
-		tfile="${tdir}/dropbear_${ktype}_host_key"
-
-		if ! _dropbearkey -t ${ktype} -f "${tfile}"; then
-			# unsupported key type
-			rm -f "${tfile}"
-			continue
-		fi
-
-		kcount=$((kcount+1))
-	done
-
-	if [ ${kcount} -ne 0 ]; then
-		mkdir -p "${kdir}"; chmod 0700 "${kdir}"; chown root "${kdir}"
-		mv -f "${tdir}/"* "${kdir}/"
-	fi
-
-	rm -rf "${tdir}"
-}
-
 append_ports()
 {
 	local ipaddrs="$1"
@@ -195,7 +110,10 @@ boot()
 
 start_service()
 {
-	hk_generate_as_needed
+	chmod 0700 /etc/dropbear
+	chmod 0600 /etc/dropbear/dropbear_rsa_host_key
+	chmod 0600 /root/.ssh/id_dropbear
+
 
 	. /lib/functions.sh
 	. /lib/functions/network.sh
