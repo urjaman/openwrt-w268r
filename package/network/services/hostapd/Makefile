@@ -84,8 +84,8 @@ endif
 
 DRIVER_MAKEOPTS= \
 	CONFIG_ACS=$(CONFIG_PACKAGE_kmod-cfg80211) \
-	CONFIG_DRIVER_NL80211=$(CONFIG_PACKAGE_kmod-cfg80211) \
-	CONFIG_IEEE80211N=$(HOSTAPD_IEEE80211N) \
+	CONFIG_DRIVER_NL80211=y \
+	CONFIG_IEEE80211N=y \
 	CONFIG_IEEE80211AC=$(HOSTAPD_IEEE80211AC) \
 	CONFIG_DRIVER_WEXT=$(CONFIG_DRIVER_WEXT_SUPPORT) \
 
@@ -138,7 +138,7 @@ ifdef CONFIG_USE_GLIBC
   TARGET_LDFLAGS_C += -lrt
 endif
 
-DRV_DEPENDS:=+PACKAGE_kmod-cfg80211:libnl-tiny
+DRV_DEPENDS:=+libnl-tiny
 
 
 define Package/hostapd/Default
@@ -446,9 +446,9 @@ TARGET_CPPFLAGS := \
 TARGET_CFLAGS += -ffunction-sections -fdata-sections -flto
 TARGET_LDFLAGS += -Wl,--gc-sections -flto=jobserver -fuse-linker-plugin -lubox -lubus
 
-ifdef CONFIG_PACKAGE_kmod-cfg80211
+#ifdef CONFIG_PACKAGE_kmod-cfg80211
   TARGET_LDFLAGS += -lm -lnl-tiny
-endif
+#endif
 
 define Build/RunMake
 	CFLAGS="$(TARGET_CPPFLAGS) $(TARGET_CFLAGS)" \
