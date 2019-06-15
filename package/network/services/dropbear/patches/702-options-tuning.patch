@@ -1,0 +1,45 @@
+From a45a9d96cc339b2dd1f53c35d8acd428b97640a5 Mon Sep 17 00:00:00 2001
+From: Urja Rannikko <urjaman@gmail.com>
+Date: Tue, 17 Oct 2017 20:09:56 +0300
+Subject: [PATCH 2/2] options tuning
+
+---
+ options.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/options.h b/options.h
+index c2123d8..ff92b0b 100644
+--- a/options.h
++++ b/options.h
+@@ -73,8 +73,8 @@ much traffic. */
+ #define ENABLE_SVR_REMOTETCPFWD
+ 
+ /* Enable Authentication Agent Forwarding */
+-#define ENABLE_SVR_AGENTFWD
+-#define ENABLE_CLI_AGENTFWD
++/*#define ENABLE_SVR_AGENTFWD*/
++/*#define ENABLE_CLI_AGENTFWD*/
+ 
+ 
+ /* Note: Both ENABLE_CLI_PROXYCMD and ENABLE_CLI_NETCAT must be set to
+@@ -86,7 +86,7 @@ much traffic. */
+ 
+ /* Enable "Netcat mode" option. This will forward standard input/output
+  * to a remote TCP-forwarded connection */
+-/*#define ENABLE_CLI_NETCAT*/
++#define ENABLE_CLI_NETCAT
+ 
+ /* Whether to support "-c" and "-m" flags to choose ciphers/MACs at runtime */
+ #define ENABLE_USER_ALGO_LIST
+@@ -218,7 +218,7 @@ If you test it please contact the Dropbear author */
+ 
+ /* This requires crypt() */
+ #ifdef HAVE_CRYPT
+-#define ENABLE_SVR_PASSWORD_AUTH
++/*#define ENABLE_SVR_PASSWORD_AUTH*/
+ #endif
+ /* PAM requires ./configure --enable-pam */
+ /*#define ENABLE_SVR_PAM_AUTH */
+-- 
+2.14.2
+
