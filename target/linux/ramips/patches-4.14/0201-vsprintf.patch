@@ -1,0 +1,17 @@
+--- a/lib/vsprintf.c
++++ b/lib/vsprintf.c
+@@ -690,12 +690,14 @@ char *symbol_string(char *buf, char *end
+ #else
+ 	len = snprintf(sym, sizeof(sym), "0x%lx", value);
+ 
++#ifdef CONFIG_MODULES
+ 	mod = __module_address(value);
+ 	if (mod)
+ 		snprintf(sym + len, sizeof(sym) - len, " [%s@%p+0x%x]",
+ 			 mod->name, mod->core_layout.base,
+ 			 mod->core_layout.size);
+ #endif
++#endif
+ 	return string(buf, end, sym, spec);
+ }
+ 
