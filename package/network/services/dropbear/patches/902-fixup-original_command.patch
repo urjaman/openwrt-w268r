@@ -1,0 +1,19 @@
+--- a/svr-chansession.c
++++ b/svr-chansession.c
+@@ -694,6 +694,7 @@ static int sessioncommand(struct Channel
+ 	}
+ 	
+ 
++#if DROPBEAR_SVR_PUBKEY_OPTIONS_BUILT
+ 	/* take global command into account */
+ 	if (svr_opts.forced_command) {
+ 		chansess->original_command = chansess->cmd ? : m_strdup("");
+@@ -702,7 +703,7 @@ static int sessioncommand(struct Channel
+ 		/* take public key option 'command' into account */
+ 		svr_pubkey_set_forced_command(chansess);
+ 	}
+-
++#endif
+ 
+ #if LOG_COMMANDS
+ 	if (chansess->cmd) {
