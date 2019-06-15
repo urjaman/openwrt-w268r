@@ -133,7 +133,7 @@ endef
 define Build/Compile
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
-		PROGRAMS="dropbear $(if $(CONFIG_DROPBEAR_DBCLIENT),dbclient,) dropbearkey scp" \
+		PROGRAMS="dropbear $(if $(CONFIG_DROPBEAR_DBCLIENT),dbclient,) scp" \
 		MULTI=1 SCPPROGRESS=1
 	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
@@ -145,7 +145,7 @@ define Package/dropbear/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dropbearmulti $(1)/usr/sbin/dropbear
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(if $(CONFIG_DROPBEAR_DBCLIENT),$(LN) ../sbin/dropbear $(1)/usr/bin/dbclient,)
-	$(LN) ../sbin/dropbear $(1)/usr/bin/dropbearkey
+#	$(LN) ../sbin/dropbear $(1)/usr/bin/dropbearkey
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/dropbear.config $(1)/etc/config/dropbear
 	$(INSTALL_DIR) $(1)/etc/init.d
@@ -153,7 +153,8 @@ define Package/dropbear/install
 	$(INSTALL_DIR) $(1)/usr/lib/opkg/info
 	$(INSTALL_DIR) $(1)/etc/dropbear
 	$(if $(CONFIG_DROPBEAR_ECC),touch $(1)/etc/dropbear/dropbear_ecdsa_host_key)
-	touch $(1)/etc/dropbear/dropbear_rsa_host_key
+#	touch $(1)/etc/dropbear/dropbear_rsa_host_key
+	$(INSTALL_DATA) ./files/dropbear_rsa_host_key $(1)/etc/dropbear/dropbear_rsa_host_key
 endef
 
 define Package/dropbearconvert/install
