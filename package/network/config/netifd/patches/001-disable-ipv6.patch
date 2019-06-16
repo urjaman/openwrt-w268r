@@ -1,0 +1,204 @@
+--- a/interface.c
++++ b/interface.c
+@@ -487,6 +487,7 @@ interface_remove_user(struct interface_u
+ 	dep->iface = NULL;
+ }
+ 
++#if 0
+ static void
+ interface_add_assignment_classes(struct interface *iface, struct blob_attr *list)
+ {
+@@ -505,6 +506,7 @@ interface_add_assignment_classes(struct
+ 		list_add(&c->head, &iface->assignment_classes);
+ 	}
+ }
++#endif
+ 
+ static void
+ interface_clear_assignment_classes(struct interface *iface)
+@@ -832,14 +834,17 @@ interface_alloc(const char *name, struct
+ 	if ((cur = tb[IFACE_ATTR_METRIC]))
+ 		iface->metric = blobmsg_get_u32(cur);
+ 
++#if 0
+ 	if ((cur = tb[IFACE_ATTR_IP6ASSIGN]))
+ 		iface->assignment_length = blobmsg_get_u32(cur);
+ 
+ 	/* defaults */
+ 	iface->assignment_iface_id_selection = IFID_FIXED;
+-	iface->assignment_fixed_iface_id = in6addr_any;
++	iface->assignment_fixed_iface_id = inaddr_any;
+ 	iface->assignment_fixed_iface_id.s6_addr[15] = 1;
++#endif
+ 
++#if 0
+ 	if ((cur = tb[IFACE_ATTR_IP6IFACEID])) {
+ 		const char *ifaceid = blobmsg_data(cur);
+ 		if (!strcmp(ifaceid, "random")) {
+@@ -861,8 +866,10 @@ interface_alloc(const char *name, struct
+ 			}
+ 		}
+ 	}
++#endif
+ 
+ 	iface->assignment_hint = -1;
++#if 0
+ 	if ((cur = tb[IFACE_ATTR_IP6HINT]))
+ 		iface->assignment_hint = strtol(blobmsg_get_string(cur), NULL, 16) &
+ 				~((1 << (64 - iface->assignment_length)) - 1);
+@@ -872,17 +879,19 @@ interface_alloc(const char *name, struct
+ 
+ 	if ((cur = tb[IFACE_ATTR_IP6WEIGHT]))
+ 		iface->assignment_weight = blobmsg_get_u32(cur);
++#endif
+ 
+ 	if ((cur = tb[IFACE_ATTR_IP4TABLE])) {
+ 		if (!system_resolve_rt_table(blobmsg_data(cur), &iface->ip4table))
+ 			DPRINTF("Failed to resolve routing table: %s\n", (char *) blobmsg_data(cur));
+ 	}
+ 
++#if 0
+ 	if ((cur = tb[IFACE_ATTR_IP6TABLE])) {
+ 		if (!system_resolve_rt_table(blobmsg_data(cur), &iface->ip6table))
+ 			DPRINTF("Failed to resolve routing table: %s\n", (char *) blobmsg_data(cur));
+ 	}
+-
++#endif
+ 	iface->proto_ip.no_delegation = !blobmsg_get_bool_default(tb[IFACE_ATTR_DELEGATE], true);
+ 
+ 	iface->config_autostart = iface->autostart;
+@@ -1259,7 +1268,9 @@ interface_change_config(struct interface
+ 	UPDATE(metric, reload_ip);
+ 	UPDATE(proto_ip.no_defaultroute, reload_ip);
+ 	UPDATE(ip4table, reload_ip);
++#if 0
+ 	UPDATE(ip6table, reload_ip);
++#endif
+ 	interface_merge_assignment_data(if_old, if_new);
+ 
+ #undef UPDATE
+--- a/interface-ip.c
++++ b/interface-ip.c
+@@ -92,7 +92,7 @@ const struct uci_blob_param_list neighbo
+ 
+ 
+ struct list_head prefixes = LIST_HEAD_INIT(prefixes);
+-static struct device_prefix *ula_prefix = NULL;
++//static struct device_prefix *ula_prefix = NULL;
+ static struct uloop_timeout valid_until_timeout;
+ 
+ 
+@@ -829,6 +829,7 @@ interface_update_host_route(struct vlist
+ 	}
+ }
+ 
++#if 0
+ static void
+ random_ifaceid(struct in6_addr *addr)
+ {
+@@ -893,11 +894,13 @@ generate_ifaceid(struct interface *iface
+ 	}
+ 	return ret;
+ }
++#endif
+ 
+ static void
+ interface_set_prefix_address(struct device_prefix_assignment *assignment,
+ 		const struct device_prefix *prefix, struct interface *iface, bool add)
+ {
++#if 0
+ 	const struct interface *uplink = prefix->iface;
+ 	if (!iface->l3_dev.dev)
+ 		return;
+@@ -994,8 +997,10 @@ interface_set_prefix_address(struct devi
+ 
+ 		assignment->enabled = true;
+ 	}
++#endif
+ }
+ 
++#if 0
+ static bool interface_prefix_assign(struct list_head *list,
+ 		struct device_prefix_assignment *assign)
+ {
+@@ -1038,9 +1043,12 @@ static int prefix_assignment_cmp(const v
+ 
+ 	return strcmp(a1->name, a2->name);
+ }
++#endif
+ 
+ static void interface_update_prefix_assignments(struct device_prefix *prefix, bool setup)
+ {
++	return;
++#if 0
+ 	struct device_prefix_assignment *c;
+ 	struct interface *iface;
+ 
+@@ -1173,6 +1181,7 @@ static void interface_update_prefix_assi
+ 	if (!assigned_any)
+ 		netifd_log_message(L_WARNING, "You have delegated IPv6-prefixes but haven't assigned them "
+ 				"to any interface. Did you forget to set option ip6assign on your lan-interfaces?");
++#endif
+ }
+ 
+ 
+@@ -1207,6 +1216,7 @@ interface_update_prefix(struct vlist_tre
+ 			     struct vlist_node *node_new,
+ 			     struct vlist_node *node_old)
+ {
++#if 0
+ 	struct device_prefix *prefix_old, *prefix_new;
+ 	prefix_old = container_of(node_old, struct device_prefix, node);
+ 	prefix_new = container_of(node_new, struct device_prefix, node);
+@@ -1258,13 +1268,15 @@ interface_update_prefix(struct vlist_tre
+ 	if (node_new && (!prefix_new->iface || !prefix_new->iface->proto_ip.no_delegation))
+ 		list_add(&prefix_new->head, &prefixes);
+ 
++#endif
+ }
+-
+ struct device_prefix*
+ interface_ip_add_device_prefix(struct interface *iface, struct in6_addr *addr,
+ 		uint8_t length, time_t valid_until, time_t preferred_until,
+ 		struct in6_addr *excl_addr, uint8_t excl_length, const char *pclass)
+ {
++	return NULL;
++#if 0
+ 	if (!pclass)
+ 		pclass = (iface) ? iface->name : "local";
+ 
+@@ -1292,11 +1304,13 @@ interface_ip_add_device_prefix(struct in
+ 		interface_update_prefix(NULL, &prefix->node, NULL);
+ 
+ 	return prefix;
++#endif
+ }
+ 
+ void
+ interface_ip_set_ula_prefix(const char *prefix)
+ {
++#if 0
+ 	char buf[INET6_ADDRSTRLEN + 4] = {0}, *saveptr;
+ 	if (prefix)
+ 		strncpy(buf, prefix, sizeof(buf) - 1);
+@@ -1324,6 +1338,7 @@ interface_ip_set_ula_prefix(const char *
+ 		ula_prefix = interface_ip_add_device_prefix(NULL, &addr, length,
+ 				0, 0, NULL, 0, NULL);
+ 	}
++#endif
+ }
+ 
+ static void
+@@ -1539,8 +1554,11 @@ void interface_ip_set_enabled(struct int
+ 		return;
+ 
+ 	vlist_for_each_element(&ip->addr, addr, node) {
++#if 0
+ 		bool v6 = ((addr->flags & DEVADDR_FAMILY) == DEVADDR_INET6) ? true : false;
+-
++#else
++		bool v6 = false;
++#endif
+ 		if (addr->flags & DEVADDR_EXTERNAL)
+ 			continue;
+ 
