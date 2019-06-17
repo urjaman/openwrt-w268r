@@ -1,7 +1,10 @@
 #!/bin/sh
 cd /
-gunzip < /dev/mtd4ro | cpio -iduvH newc
+gunzip < /dev/mtd4ro | cpio -iduvmH newc
 if [ -f /tmp/random ]; then
+	savetime="$(date -r /tmp/random +%s)"
+	[ "$(date +%s)" -lt $savetime ] && date -s @$savetime
+
 	cat /tmp/random > /dev/urandom
 	rm /tmp/random
 	#echo "Restored entropy."
