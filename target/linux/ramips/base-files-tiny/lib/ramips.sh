@@ -534,7 +534,7 @@ ramips_board_detect() {
 		;;
 	*"W268R")
 		name="w268r"
-
+		;;
 	*"W2914NS v2")
 		name="w2914nsv2"
 		;;
