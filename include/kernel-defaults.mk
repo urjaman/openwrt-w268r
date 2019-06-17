@@ -101,7 +101,7 @@ define Kernel/Configure/MakeSet
 endef
 else
 define Kernel/Configure/MakeSet
-	cp $(TOPDIR)/env/kernel-config-override .config.set
+	cp $(TOPDIR)/env/kernel-config-override $(LINUX_DIR)/.config.set
 endef
 endif
 
