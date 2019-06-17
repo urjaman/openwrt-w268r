@@ -27,7 +27,7 @@ stop() {
 maxtime() {
 	local file newest
 
-	for file in $( find /etc -type f ) ; do
+	for file in $( echo /etc/* ) ; do
 		[ -z "$newest" -o "$newest" -ot "$file" ] && newest=$file
 	done
 	[ "$newest" ] && date -r "$newest" +%s
