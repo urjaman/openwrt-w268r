@@ -1,0 +1,100 @@
+From 1a0e1a0798000da00acd8882175bfea3d0d20407 Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Sun, 9 Apr 2017 22:06:47 -0700
+Subject: [PATCH 954/967] x86: Make exception handler functions visible
+
+Make the C exception handler functions that are directly called through
+exception tables visible. LTO needs to know they are accessed from assembler.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ arch/x86/mm/extable.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+index 9fe656c42..8bd4b864e 100644
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -21,7 +21,7 @@ ex_fixup_handler(const struct exception_table_entry *x)
+ 	return (ex_handler_t)((unsigned long)&x->handler + x->handler);
+ }
+ 
+-bool ex_handler_default(const struct exception_table_entry *fixup,
++__visible bool ex_handler_default(const struct exception_table_entry *fixup,
+ 		       struct pt_regs *regs, int trapnr)
+ {
+ 	regs->ip = ex_fixup_addr(fixup);
+@@ -29,7 +29,7 @@ bool ex_handler_default(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL(ex_handler_default);
+ 
+-bool ex_handler_fault(const struct exception_table_entry *fixup,
++__visible bool ex_handler_fault(const struct exception_table_entry *fixup,
+ 		     struct pt_regs *regs, int trapnr)
+ {
+ 	regs->ip = ex_fixup_addr(fixup);
+@@ -42,7 +42,7 @@ EXPORT_SYMBOL_GPL(ex_handler_fault);
+  * Handler for UD0 exception following a failed test against the
+  * result of a refcount inc/dec/add/sub.
+  */
+-bool ex_handler_refcount(const struct exception_table_entry *fixup,
++__visible bool ex_handler_refcount(const struct exception_table_entry *fixup,
+ 			 struct pt_regs *regs, int trapnr)
+ {
+ 	/* First unconditionally saturate the refcount. */
+@@ -95,6 +95,7 @@ EXPORT_SYMBOL(ex_handler_refcount);
+  * of vulnerability by restoring from the initial state (essentially, zeroing
+  * out all the FPU registers) if we can't restore from the task's FPU state.
+  */
++__visible
+ bool ex_handler_fprestore(const struct exception_table_entry *fixup,
+ 			  struct pt_regs *regs, int trapnr)
+ {
+@@ -108,7 +109,7 @@ bool ex_handler_fprestore(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL_GPL(ex_handler_fprestore);
+ 
+-bool ex_handler_ext(const struct exception_table_entry *fixup,
++__visible bool ex_handler_ext(const struct exception_table_entry *fixup,
+ 		   struct pt_regs *regs, int trapnr)
+ {
+ 	/* Special hack for uaccess_err */
+@@ -118,7 +119,7 @@ bool ex_handler_ext(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL(ex_handler_ext);
+ 
+-bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
++__visible bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
+ 			     struct pt_regs *regs, int trapnr)
+ {
+ 	if (pr_warn_once("unchecked MSR access error: RDMSR from 0x%x at rIP: 0x%lx (%pF)\n",
+@@ -133,7 +134,7 @@ bool ex_handler_rdmsr_unsafe(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL(ex_handler_rdmsr_unsafe);
+ 
+-bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
++__visible bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
+ 			     struct pt_regs *regs, int trapnr)
+ {
+ 	if (pr_warn_once("unchecked MSR access error: WRMSR to 0x%x (tried to write 0x%08x%08x) at rIP: 0x%lx (%pF)\n",
+@@ -147,7 +148,7 @@ bool ex_handler_wrmsr_unsafe(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL(ex_handler_wrmsr_unsafe);
+ 
+-bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
++__visible bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
+ 			 struct pt_regs *regs, int trapnr)
+ {
+ 	if (static_cpu_has(X86_BUG_NULL_SEG))
+@@ -157,7 +158,7 @@ bool ex_handler_clear_fs(const struct exception_table_entry *fixup,
+ }
+ EXPORT_SYMBOL(ex_handler_clear_fs);
+ 
+-bool ex_has_fault_handler(unsigned long ip)
++__visible bool ex_has_fault_handler(unsigned long ip)
+ {
+ 	const struct exception_table_entry *e;
+ 	ex_handler_t handler;
+-- 
+2.21.0
+

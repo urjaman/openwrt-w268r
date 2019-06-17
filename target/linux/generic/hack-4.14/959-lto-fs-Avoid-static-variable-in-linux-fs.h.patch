@@ -1,0 +1,49 @@
+From 1a8d7e6e4989af9749d319d8bf9295fab85517c4 Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Tue, 11 Apr 2017 01:55:19 -0700
+Subject: [PATCH 959/967] lto, fs: Avoid static variable in linux/fs.h
+
+linux/fs.h has a initialized static variable kernel_read_file_str. It doesn't
+make much sense to have a static variable in a frequently included
+header file. With LTO -fno-toplevel-reorder gcc is unable to eliminate
+it, which leads to a lot of unnecessary duplicated copies.
+
+Move the static into the scope of the only inline that uses it,
+this tells the compiler enough to not duplicate it. Right now
+the inline is only called from one place, so that is ok. If it was
+called from more places would need to move it somewhere else
+to avoid unnecessary copies.
+
+With LTO this avoids ~100k unnecessary data segment for a x86 defconfig
+build. Even without LTO it doesn't make any sense.
+
+Cc: viro@zeniv.linux.org.uk
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ include/linux/fs.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index dafac283b..389e6dd70 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2794,12 +2794,12 @@ enum kernel_read_file_id {
+ 	__kernel_read_file_id(__fid_enumify)
+ };
+ 
+-static const char * const kernel_read_file_str[] = {
+-	__kernel_read_file_id(__fid_stringify)
+-};
+-
+ static inline const char *kernel_read_file_id_str(enum kernel_read_file_id id)
+ {
++	static const char * const kernel_read_file_str[] = {
++		__kernel_read_file_id(__fid_stringify)
++	};
++
+ 	if ((unsigned)id >= READING_MAX_ID)
+ 		return kernel_read_file_str[READING_UNKNOWN];
+ 
+-- 
+2.21.0
+
