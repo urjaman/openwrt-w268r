@@ -93,32 +93,11 @@ TARGET_CFLAGS += -DARGTYPE=3 -ffunction-sections -fdata-sections -flto
 TARGET_LDFLAGS += -Wl,--gc-sections -flto=jobserver
 
 define Build/Configure
-	: > $(PKG_BUILD_DIR)/localoptions.h
-
 	$(Build/Configure/Default)
-
-	echo '#define DEFAULT_PATH "$(TARGET_INIT_PATH)"' >> \
-		$(PKG_BUILD_DIR)/localoptions.h
-
-	echo '#define DROPBEAR_CURVE25519 $(if $(CONFIG_DROPBEAR_CURVE25519),1,0)' >> \
-		$(PKG_BUILD_DIR)/localoptions.h
-
-	for OPTION in DROPBEAR_ECDSA DROPBEAR_ECDH; do \
-		echo "#define $$$$OPTION $(if $(CONFIG_DROPBEAR_ECC),1,0)" >> \
-			$(PKG_BUILD_DIR)/localoptions.h; \
-	done
 
 	# remove protocol idented software version number
 	$(ESED) 's,^(#define LOCAL_IDENT) .*$$$$,\1 "SSH-2.0-dropbear",g' \
 		$(PKG_BUILD_DIR)/sysoptions.h
-
-	# disable legacy/unsafe methods and unused functionality
-	for OPTION in INETD_MODE DROPBEAR_CLI_NETCAT \
-	DROPBEAR_3DES DROPBEAR_DSS DROPBEAR_ENABLE_CBC_MODE \
-	DROPBEAR_SHA1_96_HMAC DROPBEAR_USE_PASSWORD_ENV; do \
-		echo "#define $$$$OPTION 0" >> \
-			$(PKG_BUILD_DIR)/localoptions.h; \
-	done
 
 	# enable nistp384 and nistp521 only if full ECC support was requested
 	for OPTION in DROPBEAR_ECC_384 DROPBEAR_ECC_521; do \
