@@ -1,7 +1,7 @@
 #!/bin/sh
 
 log_urandom_seed() {
-    echo "urandom-seed: $1" > /dev/kmsg
+    echo "urandom-seed: $1" > /dev/console
 }
 
 _do_urandom_seed() {
