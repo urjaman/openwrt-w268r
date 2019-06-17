@@ -1,0 +1,18 @@
+--- a/common-session.c
++++ b/common-session.c
+@@ -68,6 +68,7 @@ void common_session_init(int sock_in, in
+ 	/* Sets it to lowdelay */
+ 	update_channel_prio();
+ 
++#if 0
+ #if !DROPBEAR_SVR_MULTIUSER
+ 	/* A sanity check to prevent an accidental configuration option
+ 	   leaving multiuser systems exposed */
+@@ -77,6 +78,7 @@ void common_session_init(int sock_in, in
+ 		dropbear_exit("Non-multiuser Dropbear requires a non-multiuser kernel");
+ 	}
+ #endif
++#endif
+ 
+ 	now = monotonic_now();
+ 	ses.connect_time = now;
