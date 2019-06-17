@@ -61,10 +61,8 @@ define Package/base-files-tiny/conffiles
 /etc/protocols
 /etc/rc.local
 /etc/services
-/etc/shadow
 /etc/shells
 /etc/sysctl.conf
-/etc/sysupgrade.conf
 $(call $(TARGET)/conffiles)
 endef
 
@@ -157,7 +155,6 @@ define Package/base-files-tiny/install
 	mkdir -p $(1)/etc/config
 	mkdir -p $(1)/etc/crontabs
 	mkdir -p $(1)/etc/rc.d
-	mkdir -p $(1)/overlay
 	mkdir -p $(1)/lib/firmware
 	$(if $(LIB_SUFFIX),-$(LN) lib $(1)/lib$(LIB_SUFFIX))
 	mkdir -p $(1)/mnt
@@ -167,7 +164,6 @@ define Package/base-files-tiny/install
 	$(if $(LIB_SUFFIX),-$(LN) lib $(1)/usr/lib$(LIB_SUFFIX))
 	mkdir -p $(1)/usr/bin
 	mkdir -p $(1)/sys
-	mkdir -p $(1)/www
 	mkdir -p $(1)/root
 	$(LN) /proc/mounts $(1)/etc/mtab
 	rm -f $(1)/var
@@ -175,7 +171,6 @@ define Package/base-files-tiny/install
 	mkdir -p $(1)/etc
 	$(LN) /tmp/resolv.conf /tmp/TZ /tmp/localtime $(1)/etc/
 
-	chmod 0600 $(1)/etc/shadow
 	chmod 1777 $(1)/tmp
 
 	$(call ImageConfigOptions,$(1))
@@ -195,8 +190,6 @@ define Package/base-files-tiny/install
 		mkdir -p $(1)/etc/opkg; \
 		$(call FeedSourcesAppend,$(1)/etc/opkg/distfeeds.conf); \
 		$(VERSION_SED_SCRIPT) $(1)/etc/opkg/distfeeds.conf)
-	$(if $(CONFIG_IPK_FILES_CHECKSUMS), \
-		rm -f $(1)/sbin/pkg_check,)
 endef
 
 ifneq ($(DUMP),1)
