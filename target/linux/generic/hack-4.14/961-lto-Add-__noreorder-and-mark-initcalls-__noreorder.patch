@@ -1,0 +1,68 @@
+From e754413a0ff540b87188dea38d1be264eb912a5d Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Tue, 31 Mar 2015 03:45:39 -0700
+Subject: [PATCH 961/967] lto: Add __noreorder and mark initcalls __noreorder
+
+gcc 5 has a new no_reorder attribute that prevents top level
+reordering only for that symbol.
+
+Kernels don't like any reordering of initcalls between files, as several
+initcalls depend on each other. LTO previously needed to use
+-fno-toplevel-reordering to prevent boot failures.
+
+Add a __noreorder wrapper for the no_reorder attribute and use
+it for initcalls.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ include/linux/compiler-gcc.h   | 5 +++++
+ include/linux/compiler_types.h | 3 +++
+ include/linux/init.h           | 2 +-
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index 55afdf9cf..c5eb4fa9c 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -352,6 +352,11 @@
+ #define __no_sanitize_address
+ #endif
+ 
++#if __GNUC__ >= 5
++/* Avoid reordering a top level statement */
++#define __noreorder    __attribute__((no_reorder))
++#endif
++
+ /*
+  * A trick to suppress uninitialized variable warning without generating any
+  * code
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 55e4be8b0..ada75a9fe 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -272,6 +272,9 @@ struct ftrace_likely_data {
+ #define __assume_aligned(a, ...)
+ #endif
+ 
++#ifndef __noreorder
++#define __noreorder
++#endif
+ 
+ /* Are two types/vars the same type (ignoring qualifiers)? */
+ #ifndef __same_type
+diff --git a/include/linux/init.h b/include/linux/init.h
+index 07cab8a05..27ad742fc 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -170,7 +170,7 @@ extern bool initcall_debug;
+  */
+ 
+ #define __define_initcall(fn, id) \
+-	static initcall_t __initcall_##fn##id __used \
++	static initcall_t __initcall_##fn##id __used __noreorder \
+ 	__attribute__((__section__(".initcall" #id ".init"))) = fn;
+ 
+ /*
+-- 
+2.21.0
+

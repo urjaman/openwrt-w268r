@@ -1,0 +1,31 @@
+From 90002f3b8c25d0e1a9a7e81b9bfbe33ba2718c88 Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Sun, 9 Apr 2017 22:07:45 -0700
+Subject: [PATCH 960/967] lto, x86, mm: Disable vmalloc BUILD_BUG_ON for LTO
+
+On 32bit builds this BUILD_BUG_ON often fires with LTO for unknown
+reasons. As far as I can tell it's a false positive. So disable
+it for LTO.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ arch/x86/mm/init_32.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/mm/init_32.c b/arch/x86/mm/init_32.c
+index 3141e67ec..03a73da90 100644
+--- a/arch/x86/mm/init_32.c
++++ b/arch/x86/mm/init_32.c
+@@ -829,7 +829,9 @@ void __init mem_init(void)
+ 	BUILD_BUG_ON(VMALLOC_END			> PKMAP_BASE);
+ #endif
+ #define high_memory (-128UL << 20)
++#ifndef CONFIG_LTO
+ 	BUILD_BUG_ON(VMALLOC_START			>= VMALLOC_END);
++#endif
+ #undef high_memory
+ #undef __FIXADDR_TOP
+ 
+-- 
+2.21.0
+

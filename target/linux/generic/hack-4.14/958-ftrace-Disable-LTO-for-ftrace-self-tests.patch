@@ -1,0 +1,31 @@
+From d01a208c2d104af3a1e54f7adee8fcbd4d85ee1b Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Mon, 27 Nov 2017 10:24:10 -0800
+Subject: [PATCH 958/967] ftrace: Disable LTO for ftrace self tests
+
+Even when the test functions are not inlined something makes the ftrace
+self tests fail with LTO. ftrace manually tests seems to work fine.
+Disable LTO for the self test file, which makes the self tests work
+again.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ kernel/trace/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index 19a15b2f1..6bfad27eb 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -8,7 +8,7 @@ KBUILD_CFLAGS = $(subst $(CC_FLAGS_FTRACE),,$(ORIG_CFLAGS))
+ 
+ ifdef CONFIG_FTRACE_SELFTEST
+ # selftest needs instrumentation
+-CFLAGS_trace_selftest_dynamic.o = $(CC_FLAGS_FTRACE)
++CFLAGS_trace_selftest_dynamic.o = $(CC_FLAGS_FTRACE) ${DISABLE_LTO}
+ obj-y += trace_selftest_dynamic.o
+ endif
+ endif
+-- 
+2.21.0
+

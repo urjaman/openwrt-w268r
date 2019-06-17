@@ -1,0 +1,34 @@
+From af640a7f44183c10969c351ed01502391e3dcb71 Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Mon, 10 Feb 2014 07:26:30 +0100
+Subject: [PATCH 952/967] x86/timer: Don't inline __const_udelay
+
+__const_udelay is marked inline, and LTO will happily inline it everywhere
+Dropping the inline saves ~44k text in a LTO build.
+
+13999560        1740864 1499136 17239560        1070e08 vmlinux-with-udelay-inline
+13954764        1736768 1499136 17190668        1064f0c vmlinux-wo-udelay-inline
+
+Even without LTO I believe marking it noinline documents it correctly.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ arch/x86/lib/delay.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/lib/delay.c b/arch/x86/lib/delay.c
+index 4846eff7e..f5b7f1b3b 100644
+--- a/arch/x86/lib/delay.c
++++ b/arch/x86/lib/delay.c
+@@ -162,7 +162,7 @@ void __delay(unsigned long loops)
+ }
+ EXPORT_SYMBOL(__delay);
+ 
+-inline void __const_udelay(unsigned long xloops)
++void __const_udelay(unsigned long xloops)
+ {
+ 	unsigned long lpj = this_cpu_read(cpu_info.loops_per_jiffy) ? : loops_per_jiffy;
+ 	int d0;
+-- 
+2.21.0
+

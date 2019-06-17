@@ -1,0 +1,42 @@
+From 648b736cfb8de43208cff44e99750970932ba84c Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Fri, 24 Nov 2017 15:24:35 -0800
+Subject: [PATCH 957/967] ftrace: Mark function tracer test functions
+ noinline/noclone
+
+The ftrace function tracer self tests calls some functions to verify
+the get traced. This relies on them not being inlined. Previously
+this was ensured by putting them into another file, but with LTO
+the compiler can inline across files, which makes the tests fail.
+
+Mark these functions as noinline and noclone.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ kernel/trace/trace_selftest_dynamic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/trace/trace_selftest_dynamic.c b/kernel/trace/trace_selftest_dynamic.c
+index 8cda06a10..c364cf777 100644
+--- a/kernel/trace/trace_selftest_dynamic.c
++++ b/kernel/trace/trace_selftest_dynamic.c
+@@ -1,13 +1,14 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/compiler.h>
+ #include "trace.h"
+ 
+-int DYN_FTRACE_TEST_NAME(void)
++noinline __noclone int DYN_FTRACE_TEST_NAME(void)
+ {
+ 	/* used to call mcount */
+ 	return 0;
+ }
+ 
+-int DYN_FTRACE_TEST_NAME2(void)
++noinline __noclone int DYN_FTRACE_TEST_NAME2(void)
+ {
+ 	/* used to call mcount */
+ 	return 0;
+-- 
+2.21.0
+
