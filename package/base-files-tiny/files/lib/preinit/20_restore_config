@@ -1,0 +1,15 @@
+#!/bin/sh
+
+do_restore_config() {
+	# WPS button is GPIO 0, the kernel has no button or led drivers, so
+	# just use the sysfs gpio interface
+	echo 0 > /sys/class/gpio/export
+	[ -e /sys/class/gpio/gpio0 ] || sleep 1
+
+	# if WPS button is pressed (0), we skip restore
+	if [ "$(cat /sys/class/gpio/gpio0/value)" != "0" ]; then
+		restore-config
+	fi
+}
+
+boot_hook_add preinit_main do_restore_config
