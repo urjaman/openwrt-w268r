@@ -1,0 +1,13 @@
+diff --git a/initd/init.c b/initd/init.c
+index 238f848..de4f17b 100644
+--- a/initd/init.c
++++ b/initd/init.c
+@@ -70,8 +70,6 @@ cmdline(void)
+ int
+ main(int argc, char **argv)
+ {
+-	pid_t pid;
+-
+ 	ulog_open(ULOG_KMSG, LOG_DAEMON, "init");
+ 
+ 	sigaction(SIGTERM, &sa_shutdown, NULL);
