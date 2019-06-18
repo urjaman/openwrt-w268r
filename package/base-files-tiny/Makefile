@@ -34,6 +34,11 @@ ifneq ($(DUMP),1)
   TARGET:=-$(BOARD)
 endif
 
+define Package/base-files-tiny/config
+	source "$(SOURCE)/Config.in"
+endef
+
+
 define Package/base-files-tiny
   SECTION:=base
   CATEGORY:=Base system
@@ -119,6 +124,8 @@ ifeq ($(CONFIG_NAND_SUPPORT),)
   endef
 endif
 
+
+
 define Package/base-files-tiny/install
 	$(CP) ./files/* $(1)/
 	$(Package/base-files-tiny/install-key)
@@ -190,6 +197,8 @@ define Package/base-files-tiny/install
 		mkdir -p $(1)/etc/opkg; \
 		$(call FeedSourcesAppend,$(1)/etc/opkg/distfeeds.conf); \
 		$(VERSION_SED_SCRIPT) $(1)/etc/opkg/distfeeds.conf)
+
+	$(if $(CONFIG_BASE_FILES_TINY_NO_CONFIG_GEN),rm $(1)/bin/config_generate; $(LN) true $(1)/bin/config_generate,)
 endef
 
 ifneq ($(DUMP),1)
