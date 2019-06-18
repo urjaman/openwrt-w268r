@@ -49,6 +49,9 @@ TARGET_CPPFLAGS:= \
 	-DCONFIG_LIBNL20 \
 	-D_GNU_SOURCE
 
+TARGET_CFLAGS += -flto
+TARGET_LDFLAGS += -flto=jobserver -fuse-linker-plugin
+
 ifeq ($(BUILD_VARIANT),full)
   TARGET_CPPFLAGS += -DIW_FULL
   MAKE_FLAGS += IW_FULL=1
