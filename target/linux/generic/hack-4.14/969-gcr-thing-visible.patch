@@ -1,0 +1,12 @@
+diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+index 650ea089e..1d5672e51 100644
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -77,6 +77,7 @@ config MIPS
+ 	select RTC_LIB if !MACH_LOONGSON64
+ 	select SYSCTL_EXCEPTION_TRACE
+ 	select VIRT_TO_BUS
++	select MIPS_CM
+ 
+ menu "Machine selection"
+ 
