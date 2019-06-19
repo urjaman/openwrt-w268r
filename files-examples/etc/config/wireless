@@ -1,0 +1,17 @@
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option hwmode '11g'
+	option macaddr YOUR-MAC-ADDR
+	option htmode 'HT20'
+	option path 'platform/10180000.wmac'
+
+config wifi-iface
+	option device 'radio0'
+	option network 'lan'
+	option mode 'sta'
+	option encryption 'psk2'
+	option ssid YOUR-AP-SSID
+	option key YOUR-SECRET
+	option wds '1'
+

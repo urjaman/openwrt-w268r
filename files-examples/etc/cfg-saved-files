@@ -1,0 +1,7 @@
+/etc/cfg-saved-files
+/etc/rc.local
+/root/.ssh/known_hosts
+/sbin/update-fw.sh
+/etc/config/network
+/etc/config/wireless
+/etc/config/system
