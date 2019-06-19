@@ -1,3 +1,46 @@
+Notes for this Netwjork/Tenda W268R-specific tree
+---
+A lot has been stripped to make the image fit, and many
+things work differently:
+- initramfs-only (no on-flash filesystem, nothing saved automatically)
+  - a 64k mtd partition for storing config files as a .cpio.gz
+- no passwords 
+  - only public keys over ssh and direct shell over UART
+- no users/groups 
+- no LED control (other than the automatic switch LEDs)
+- no usual failsafe
+- no real buttons support except for a script that looks at the WPS
+  button on boot and skips config restore if pressed -> this replaces failsafe
+- no dropbearkey so all keys are pre-generated on the host
+  -> see make-up-secrets.sh
+- no netfilter so no NAT, firewalls, or such things
+
+Current feature set is roughly:
+- procd,netfid,uci,iw,dropbear (the usual gang, support for uci config and static ips)
+- DHCP client (busybox udhcpcd) (support for proto dhcp)
+- wifi client (wpa_supplicant) (and WDS works too so you can bridge it)
+- ntp client (optionally server too, untested)
+
+files-examples/ contains some examples for a WDS client bridge, an example
+list of saved files and a upgrade-fw script that you can move to files/
+once you've adapted them for your use
+
+Recommended sequence of actions:
+cp w268r_owrt_config .config
+make menuconfig -> turn off the disable of config generation under base-files-tiny Configuration
+install dropbear on the host if you dont have dropbearkey
+./make-up-secrets.sh
+test a build, get a serial + LAN link to the W268R and a TFTP server up, 
+press 1 on boot to TFTP load the image to SDRAM (just temporarily boots that),
+use "wifi config" to make up a wifi configuration (MAC address etc), look at them
+and/or move important things to the files-examples/ versions, adjust stuff
+and make a new build with the disable config generation on (if you like it a little bit smaller)
+and your preferred config files included under files/
+then reboot with TFTP ("reboot" and press 1 again) to that new firmware and see that
+it comes up accessible by default (this is the "failsafe"/default configuration
+which is just a temporary restore to defaults so you can regain access if you made a config oops)
+then update-fw.sh the firmware actually into the device once you like to keep it
+
   _______                     ________        __
  |       |.-----.-----.-----.|  |  |  |.----.|  |_
  |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
