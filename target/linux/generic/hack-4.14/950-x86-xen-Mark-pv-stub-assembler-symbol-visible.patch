@@ -1,0 +1,44 @@
+From 8f1fbe0f31e1c0a1545d322f382bdebe3f0e2926 Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Sat, 8 Apr 2017 17:35:17 -0700
+Subject: [PATCH 950/967] x86/xen: Mark pv stub assembler symbol visible
+
+With LTO any external assembler symbol has to be marked __visible.
+Mark the generated asm PV stubs __visible to prevent a linker error.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ arch/x86/include/asm/paravirt.h | 3 ++-
+ drivers/xen/time.c              | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+index c83a2f418..49af9e053 100644
+--- a/arch/x86/include/asm/paravirt.h
++++ b/arch/x86/include/asm/paravirt.h
+@@ -746,7 +746,8 @@ static __always_inline bool pv_vcpu_is_preempted(long cpu)
+  */
+ #define PV_THUNK_NAME(func) "__raw_callee_save_" #func
+ #define PV_CALLEE_SAVE_REGS_THUNK(func)					\
+-	extern typeof(func) __raw_callee_save_##func;			\
++	extern __visible typeof(func) __raw_callee_save_##func;		\
++	extern __visible typeof(func) func;				\
+ 									\
+ 	asm(".pushsection .text;"					\
+ 	    ".globl " PV_THUNK_NAME(func) ";"				\
+diff --git a/drivers/xen/time.c b/drivers/xen/time.c
+index a63fedbdc..d5b08c0a8 100644
+--- a/drivers/xen/time.c
++++ b/drivers/xen/time.c
+@@ -76,7 +76,7 @@ void xen_get_runstate_snapshot(struct vcpu_runstate_info *res)
+ }
+ 
+ /* return true when a vcpu could run but has no real cpu to run on */
+-bool xen_vcpu_stolen(int vcpu)
++__visible bool xen_vcpu_stolen(int vcpu)
+ {
+ 	return per_cpu(xen_runstate, vcpu).state == RUNSTATE_runnable;
+ }
+-- 
+2.21.0
+

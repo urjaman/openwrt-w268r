@@ -1,0 +1,32 @@
+From 26c0f982005f267752ada4156760af5229338a2e Mon Sep 17 00:00:00 2001
+From: Andi Kleen <ak@linux.intel.com>
+Date: Sat, 8 Apr 2017 17:37:26 -0700
+Subject: [PATCH 951/967] afs: Fix const confusion in AFS
+
+A trace point string cannot be const because the underlying special
+section is not marked const. An LTO build complains about the
+section attribute mismatch. Fix it by not marking the trace point
+string in afs const.
+
+Cc: dhowells@redhat.com
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ fs/afs/cmservice.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/afs/cmservice.c b/fs/afs/cmservice.c
+index c7475867a..fdcda968d 100644
+--- a/fs/afs/cmservice.c
++++ b/fs/afs/cmservice.c
+@@ -31,7 +31,7 @@ static void SRXAFSCB_ProbeUuid(struct work_struct *);
+ static void SRXAFSCB_TellMeAboutYourself(struct work_struct *);
+ 
+ #define CM_NAME(name) \
+-	const char afs_SRXCB##name##_name[] __tracepoint_string =	\
++	char afs_SRXCB##name##_name[] __tracepoint_string =	\
+ 		"CB." #name
+ 
+ /*
+-- 
+2.21.0
+
