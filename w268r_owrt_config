@@ -19,13 +19,11 @@ CONFIG_HAVE_DOT_CONFIG=y
 # CONFIG_TARGET_mpc85xx is not set
 # CONFIG_TARGET_imx6 is not set
 # CONFIG_TARGET_mxs is not set
-# CONFIG_TARGET_ixp4xx is not set
 # CONFIG_TARGET_lantiq is not set
 # CONFIG_TARGET_malta is not set
 # CONFIG_TARGET_pistachio is not set
 # CONFIG_TARGET_mvebu is not set
 # CONFIG_TARGET_kirkwood is not set
-# CONFIG_TARGET_orion is not set
 # CONFIG_TARGET_mediatek is not set
 CONFIG_TARGET_ramips=y
 # CONFIG_TARGET_at91 is not set
@@ -40,7 +38,6 @@ CONFIG_TARGET_ramips=y
 # CONFIG_TARGET_samsung is not set
 # CONFIG_TARGET_arc770 is not set
 # CONFIG_TARGET_archs38 is not set
-# CONFIG_TARGET_ar7 is not set
 # CONFIG_TARGET_omap is not set
 # CONFIG_TARGET_uml is not set
 # CONFIG_TARGET_zynq is not set
@@ -223,7 +220,7 @@ CONFIG_EXTERNAL_CPIO=""
 #
 # Root filesystem archives
 #
-# CONFIG_TARGET_ROOTFS_CPIOGZ is not set
+CONFIG_TARGET_ROOTFS_CPIOGZ=y
 CONFIG_TARGET_ROOTFS_TARGZ=y
 
 #
@@ -461,6 +458,11 @@ CONFIG_PER_FEED_REPO=y
 #
 # CONFIG_PACKAGE_base-files is not set
 CONFIG_PACKAGE_base-files-tiny=y
+
+#
+# Configuration
+#
+CONFIG_BASE_FILES_TINY_NO_CONFIG_GEN=y
 # CONFIG_PACKAGE_block-mount is not set
 # CONFIG_PACKAGE_blockd is not set
 CONFIG_PACKAGE_busybox=y
@@ -1668,8 +1670,7 @@ CONFIG_BUSYBOX_CONFIG_FEATURE_DD_SIGNAL_HANDLING=y
 # CONFIG_BUSYBOX_CONFIG_FEATURE_DD_THIRD_STATUS_LINE is not set
 CONFIG_BUSYBOX_CONFIG_FEATURE_DD_IBS_OBS=y
 # CONFIG_BUSYBOX_CONFIG_FEATURE_DD_STATUS is not set
-CONFIG_BUSYBOX_CONFIG_DF=y
-# CONFIG_BUSYBOX_CONFIG_FEATURE_DF_FANCY is not set
+# CONFIG_BUSYBOX_CONFIG_DF is not set
 CONFIG_BUSYBOX_CONFIG_DIRNAME=y
 # CONFIG_BUSYBOX_CONFIG_DOS2UNIX is not set
 # CONFIG_BUSYBOX_CONFIG_UNIX2DOS is not set
@@ -1792,7 +1793,7 @@ CONFIG_BUSYBOX_CONFIG_WC=y
 #
 # Common options for df, du, ls
 #
-CONFIG_BUSYBOX_CONFIG_FEATURE_HUMAN_READABLE=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_HUMAN_READABLE is not set
 
 #
 # Console Utilities
@@ -2762,6 +2763,7 @@ CONFIG_PACKAGE_uci=y
 # CONFIG_PACKAGE_kmod-sched-cake is not set
 # CONFIG_PACKAGE_kmod-sched-connmark is not set
 # CONFIG_PACKAGE_kmod-sched-core is not set
+# CONFIG_PACKAGE_kmod-sched-ctinfo is not set
 # CONFIG_PACKAGE_kmod-sched-flower is not set
 # CONFIG_PACKAGE_kmod-sched-ipset is not set
 # CONFIG_PACKAGE_kmod-sched-mqprio is not set
@@ -2903,6 +2905,7 @@ CONFIG_PACKAGE_uci=y
 # WPAN 802.15.4 Support
 #
 # CONFIG_PACKAGE_kmod-at86rf230 is not set
+# CONFIG_PACKAGE_kmod-atusb is not set
 # CONFIG_PACKAGE_kmod-cc2520 is not set
 # CONFIG_PACKAGE_kmod-fakelb is not set
 # CONFIG_PACKAGE_kmod-ieee802154 is not set
